@@ -1,0 +1,113 @@
+# Unity project files to ignore
+/Library/
+/Temp/
+/Obj/
+/Build/
+/Builds/
+/Logs/
+/UserSettings/
+/MemoryCaptures/
+/Recordings/
+
+# Unity3D generated meta files
+*.meta
+
+# Unity3D generated file on crash reports
+sysinfo.txt
+
+# Builds
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# Visual Studio cache directory
+.vs/
+
+# Gradle cache directory
+.gradle/
+
+# Solution and project files
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# PDB files
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Crashlytics generated file
+crashlytics-build.properties
+
+# Packed Addressables
+/Assets/AddressableAssetsData/*/*.bin*
+
+# Temporary auto-generated Android Assets
+/Assets/StreamingAssets/aa.meta
+/Assets/StreamingAssets/aa/*
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Large binary files and assets
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tga
+*.psd
+*.tiff
+*.wav
+*.mp3
+*.ogg
+*.aac
+*.flac
+*.fbx
+*.obj
+*.blend
+*.max
+*.ma
+*.mb
+*.unity
+*.prefab
+*.asset
+*.anim
+*.controller
+*.mat
+*.physicMaterial
+*.physicsMaterial2D
+*.mask
+*.rendertexture
+*.spriteatlas
+*.guiskin
+*.gimp
+*.aseprite
+*.mixer
+*.exr
+*.hdr
+
+# Compressed files
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+# Package manager cache
+/Packages/manifest.json
+/Packages/packages-lock.json

@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f46d545cede13c4468829f9d75e09561, type: 3}
+  m_Name: Meet_UncookedToCooked
+  m_EditorClassIdentifier: 
+  input: {fileID: 11400000, guid: 0e9099849d28fd140834e4536c4a28c7, type: 2}
+  output: {fileID: 11400000, guid: 3bb3f354c6ed6c34f8dd794e088e0802, type: 2}
+  cookingTimeMax: 2
