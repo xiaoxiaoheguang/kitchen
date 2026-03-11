@@ -33,7 +33,7 @@ public class GameStartCountdownUI : MonoBehaviour
             animator.SetTrigger(NUMBER_PUPOP);
             previousCountdownNumber = countdownNumber;
 
-            SoundManager.Instance.PlayCountdowndSound();
+            SoundManager.Instance.PlayCountdownSound();
         }
     }
 
