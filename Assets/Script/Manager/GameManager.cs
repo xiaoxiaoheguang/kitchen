@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    public event EventHandler OnStateChange;
+    public event EventHandler OnStateChanged;
     public event EventHandler OnPauseGame;
     public event EventHandler OnResumeGame;
 
@@ -20,11 +20,12 @@ public class GameManager : MonoBehaviour
     }
 
     private State state;
-    private float waitingToStartTimer = 1f;
+
     private float countdownTimer = 3f;
     private float gameplayTimer;
     private float gameplayTimerMax = 60f;
     private bool isPause = false;
+
 
     private void Awake()
     {
@@ -34,10 +35,20 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        GameInput.Instance.OnPauseAction += Instance_OnPauseAction;
+        GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
+        GameInput.Instance.OnInteraction += GameInput_OnInteraction;
     }
 
-    private void Instance_OnPauseAction(object sender, EventArgs e)
+    private void GameInput_OnInteraction(object sender, EventArgs e)
+    {
+        if(state == State.WattingToStart)
+        {
+            state = State.CountdownToStrat;
+            OnStateChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    private void GameInput_OnPauseAction(object sender, EventArgs e)
     {
         PauseGame();
     }
@@ -47,19 +58,14 @@ public class GameManager : MonoBehaviour
         switch (state)
         {
             case State.WattingToStart:
-                waitingToStartTimer -= Time.deltaTime;
-                if (waitingToStartTimer < 0f)
-                {
-                    state = State.CountdownToStrat;
-                    OnStateChange?.Invoke(this, EventArgs.Empty);
-                }
+
                 break;
             case State.CountdownToStrat:
                 countdownTimer -= Time.deltaTime;
                 if (countdownTimer < 0f)
                 {
                     state = State.GamePlaying;
-                    OnStateChange?.Invoke(this, EventArgs.Empty);
+                    OnStateChanged?.Invoke(this, EventArgs.Empty);
 
                     gameplayTimer = gameplayTimerMax;
                 }
@@ -69,7 +75,7 @@ public class GameManager : MonoBehaviour
                 if (gameplayTimer < 0f)
                 {
                     state = State.GameOver;
-                    OnStateChange?.Invoke(this, EventArgs.Empty);
+                    OnStateChanged?.Invoke(this, EventArgs.Empty);
                 }
                 break;
             case State.GameOver:
@@ -94,7 +100,7 @@ public class GameManager : MonoBehaviour
             OnResumeGame?.Invoke(this,EventArgs.Empty);
         }
     }
-    public bool IsGameCountdownActive()
+    public bool IsCountdownToStartActive()
     {
         return state == State.CountdownToStrat;
     }

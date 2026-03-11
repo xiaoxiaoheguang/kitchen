@@ -6,15 +6,12 @@ using UnityEngine.Rendering;
 
 public class DeliveryManager : MonoBehaviour
 {
-
-
     public static DeliveryManager Instance { get; private set; }
 
     public event EventHandler OnRecipeSpawned;
     public event EventHandler OnRecipeCompleted;
     public event EventHandler OnRecipeSuccess;
     public event EventHandler OnRecipeFailed;
-
 
     [SerializeField] private RecipeListSO recipeListSO;
     private List<RecipeSO> waitingRecipeSOList;
@@ -38,7 +35,7 @@ public class DeliveryManager : MonoBehaviour
         {
             spawnRecipeTimer = spawnRecipeTimerMax;
 
-            if (waitingRecipeSOList.Count < waitRecipeAmountMax)
+            if (GameManager.Instance.IsGamePlaying() && waitingRecipeSOList.Count < waitRecipeAmountMax)
             {
                 RecipeSO waitRecipeSO = recipeListSO.recipeSOList[UnityEngine.Random.Range(0, recipeListSO.recipeSOList.Count)];
                 waitingRecipeSOList.Add(waitRecipeSO);

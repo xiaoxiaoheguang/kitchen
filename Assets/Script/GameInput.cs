@@ -41,6 +41,11 @@ public class GameInput : MonoBehaviour
     public event EventHandler OnPauseAction;
 
     /// <summary>
+    /// Occurs when the binding is re-established or refreshed.
+    /// </summary>
+    public event EventHandler OnBindingRebind;
+
+    /// <summary>
     /// 按键绑定枚举，定义所有可自定义的输入操作
     /// 用于显示和修改按键绑定
     /// </summary>
@@ -251,6 +256,8 @@ public class GameInput : MonoBehaviour
 
                 PlayerPrefs.SetString(PLAYER_PREFS_BINDINGS, playerInput.SaveBindingOverridesAsJson());
                 PlayerPrefs.Save();
+
+                    OnBindingRebind?.Invoke(this, EventArgs.Empty);
             }).Start();
     }
     #endregion

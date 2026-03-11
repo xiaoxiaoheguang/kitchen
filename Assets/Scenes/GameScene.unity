@@ -622,7 +622,7 @@ GameObject:
   - component: {fileID: 147030691}
   - component: {fileID: 147030690}
   m_Layer: 5
-  m_Name: Image
+  m_Name: KeyIcon_Img
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -728,7 +728,7 @@ GameObject:
   - component: {fileID: 185458054}
   - component: {fileID: 185458053}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: KeyAltText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2394,7 +2394,7 @@ GameObject:
   - component: {fileID: 358522285}
   - component: {fileID: 358522284}
   m_Layer: 5
-  m_Name: Image
+  m_Name: KeyIcon_Img
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3078,7 +3078,7 @@ GameObject:
   - component: {fileID: 522621766}
   - component: {fileID: 522621765}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: KeyMoveLeftText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3483,7 +3483,7 @@ GameObject:
   - component: {fileID: 592752901}
   - component: {fileID: 592752900}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: KeyMoveDownText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4093,7 +4093,7 @@ GameObject:
   - component: {fileID: 693284463}
   - component: {fileID: 693284464}
   m_Layer: 5
-  m_Name: key (1)
+  m_Name: KeyMoveDown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4303,7 +4303,7 @@ GameObject:
   - component: {fileID: 857434608}
   - component: {fileID: 857434607}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: KeyMoveRightText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4711,7 +4711,7 @@ GameObject:
   - component: {fileID: 942954738}
   - component: {fileID: 942954737}
   m_Layer: 5
-  m_Name: Image
+  m_Name: KeyIcon_Img
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4999,7 +4999,7 @@ GameObject:
   - component: {fileID: 977417544}
   - component: {fileID: 977417545}
   m_Layer: 5
-  m_Name: key (6)
+  m_Name: KeyPause
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5498,7 +5498,7 @@ GameObject:
   - component: {fileID: 1094071999}
   - component: {fileID: 1094071998}
   m_Layer: 5
-  m_Name: bg
+  m_Name: Bg_Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6033,7 +6033,7 @@ GameObject:
   - component: {fileID: 1135324359}
   - component: {fileID: 1135324358}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: KeyPauseText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6171,7 +6171,7 @@ GameObject:
   - component: {fileID: 1147467082}
   - component: {fileID: 1147467081}
   m_Layer: 5
-  m_Name: Image
+  m_Name: KeyIcon_Img
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8070,7 +8070,7 @@ GameObject:
   - component: {fileID: 1483226913}
   - component: {fileID: 1483226914}
   m_Layer: 5
-  m_Name: GameObject
+  m_Name: KeyItems_Grp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8316,7 +8316,7 @@ GameObject:
   - component: {fileID: 1508254095}
   - component: {fileID: 1508254096}
   m_Layer: 5
-  m_Name: key (4)
+  m_Name: KeyInteract
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8573,7 +8573,7 @@ GameObject:
   - component: {fileID: 1571845922}
   - component: {fileID: 1571845921}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: KeyInteractText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9231,7 +9231,7 @@ GameObject:
   - component: {fileID: 1693830159}
   - component: {fileID: 1693830160}
   m_Layer: 5
-  m_Name: key
+  m_Name: KeyMoveUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10064,7 +10064,7 @@ GameObject:
   - component: {fileID: 1842210849}
   - component: {fileID: 1842210848}
   m_Layer: 5
-  m_Name: Image
+  m_Name: KeyIcon_Img
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10625,7 +10625,7 @@ GameObject:
   - component: {fileID: 1882691117}
   - component: {fileID: 1882691116}
   m_Layer: 5
-  m_Name: Image
+  m_Name: KeyIcon_Img
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11299,7 +11299,7 @@ GameObject:
   - component: {fileID: 1972719295}
   - component: {fileID: 1972719296}
   m_Layer: 5
-  m_Name: key (2)
+  m_Name: KeyMoveLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11445,7 +11445,7 @@ GameObject:
   - component: {fileID: 1986917703}
   - component: {fileID: 1986917702}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: KeyMoveUpText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11702,7 +11702,7 @@ GameObject:
   - component: {fileID: 1995672716}
   - component: {fileID: 1995672717}
   m_Layer: 5
-  m_Name: key (5)
+  m_Name: KeyAlt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11751,7 +11751,7 @@ GameObject:
   - component: {fileID: 2006631758}
   - component: {fileID: 2006631757}
   m_Layer: 5
-  m_Name: Image
+  m_Name: KeyIcon_Img
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11856,7 +11856,7 @@ GameObject:
   - component: {fileID: 2007246441}
   - component: {fileID: 2007246442}
   m_Layer: 5
-  m_Name: key (3)
+  m_Name: KeyMoveRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

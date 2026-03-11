@@ -9,7 +9,7 @@ public class GameStartCountdownUI : MonoBehaviour
 
     private void Start()
     {
-        GameManager.Instance.OnStateChange += Instance_OnStateChange;
+        GameManager.Instance.OnStateChanged += Instance_OnStateChange;
         Hide();
     }
     private void Update()
@@ -19,7 +19,7 @@ public class GameStartCountdownUI : MonoBehaviour
 
     private void Instance_OnStateChange(object sender, System.EventArgs e)
     {
-        if (GameManager.Instance.IsGameCountdownActive())
+        if (GameManager.Instance.IsCountdownToStartActive())
         {
             Show();
         }
