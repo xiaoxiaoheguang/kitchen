@@ -5,7 +5,7 @@ using UnityEngine;
 using static CuttingCounter;
 using static IHasProgress;
 
-public class StoveCounter : BaseCounter,IHasProgress
+public class StoveCounter : BaseCounter, IHasProgress
 {
     [SerializeField] private CookingRecipeSO[] CookingRecipeArray;
 
@@ -60,9 +60,10 @@ public class StoveCounter : BaseCounter,IHasProgress
 
                         state = State.Cooked;
 
-                         OnStateChanged?.Invoke(this, new OnStateChangedEventArgs{
-                         State = state
-                         });
+                        OnStateChanged?.Invoke(this, new OnStateChangedEventArgs
+                        {
+                            State = state
+                        });
                         //Debug.Log("cook");
                     }
 
@@ -230,5 +231,10 @@ public class StoveCounter : BaseCounter,IHasProgress
             }
         }
         return null;
+    }
+
+    public bool IsFried()
+    {
+        return state == State.Cooked;
     }
 }
