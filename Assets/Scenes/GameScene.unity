@@ -1719,11 +1719,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1253374705}
     m_Modifications:
-    - target: {fileID: 1324543999245791119, guid: eb3216cf955b4d3479a775d309e2bcf8,
-        type: 3}
-      propertyPath: failedColor.a
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3607026407763278721, guid: eb3216cf955b4d3479a775d309e2bcf8,
         type: 3}
       propertyPath: m_Name
@@ -2307,7 +2302,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.3907311, y: 0, z: 0, w: 0.9205049}
-  m_LocalPosition: {x: -0.84, y: 20.5, z: -21.2}
+  m_LocalPosition: {x: -0.84, y: 20.5, z: -21}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6553,7 +6548,7 @@ Transform:
   m_GameObject: {fileID: 1116571592}
   serializedVersion: 2
   m_LocalRotation: {x: 0.3907311, y: 0, z: 0, w: 0.9205049}
-  m_LocalPosition: {x: -0.84, y: 20.5, z: -21.2}
+  m_LocalPosition: {x: -0.84, y: 20.5, z: -21}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
