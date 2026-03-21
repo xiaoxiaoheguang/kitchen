@@ -65,7 +65,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// 倒计时计时器（秒）
     /// </summary>
-    private float countdownTimer = 3f;
+    private float countdownTimer = 1f;//todo :调试更改 原3f
 
     /// <summary>
     /// 游戏进行计时器（秒）
@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// 游戏最大时长（秒）
     /// </summary>
-    private float gameplayTimerMax = 60f;
+    private float gameplayTimerMax = 300f;//todo :调试更改 原60f
 
     /// <summary>
     /// 游戏是否暂停
@@ -102,6 +102,11 @@ public class GameManager : MonoBehaviour
     {
         GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
         GameInput.Instance.OnInteraction += GameInput_OnInteraction;
+
+
+        //todo :调试更改
+            state = State.CountdownToStart;
+            OnStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
     #endregion

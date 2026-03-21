@@ -9,7 +9,7 @@ public class CounterSelect : MonoBehaviour
 
     void Start()
     {
-        Player.instance.OnSelectedCounterChanged += Play_OnSelectedCounterChanged;
+        //Player.instance.OnSelectedCounterChanged += Play_OnSelectedCounterChanged;
     }
 
     private void Play_OnSelectedCounterChanged(object sender, Player.OnSelectedCounterChangedEventArgs e)

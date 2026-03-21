@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,13 +10,13 @@ using UnityEngine.InputSystem;
 /// 实现单例模式，提供全局访问玩家对象的能力
 /// 实现 IKitchenObjectParent 接口，支持厨房物品的拾取和放置
 /// </summary>
-public class Player : MonoBehaviour, IKitchenObjectParent
+public class Player : NetworkBehaviour, IKitchenObjectParent
 {
     /// <summary>
     /// 玩家单例实例，用于全局访问玩家对象
     /// 在 Awake 中初始化，确保场景中只有一个玩家实例
     /// </summary>
-    public static Player instance { get; private set; }
+    //public static Player instance { get; private set; }
     #region 字段与属性
     /// <summary>
     /// 玩家移动速度，单位：米/秒
@@ -23,13 +24,6 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     /// </summary>
     [Tooltip("玩家移动速度（米/秒）")]
     [SerializeField] private float moveSpeed = 5f;
-    
-    /// <summary>
-    /// 游戏输入系统引用，用于处理玩家的键盘和手柄输入
-    /// 提供移动向量和交互事件的订阅
-    /// </summary>
-    [Tooltip("游戏输入系统引用")]
-    [SerializeField] private GameInput gameInput;
 
     /// <summary>
     /// 厨房物品持有点的 Transform，用于物品跟随玩家移动
@@ -87,11 +81,11 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     /// </summary>
     private void Awake()
     {
-        if (instance != null)
-        {
-            Debug.LogError("more instence");
-        }
-        instance = this;
+        //if (instance != null)
+        //{
+        //    Debug.LogError("more instence");
+        //}
+        //instance = this;
     }
     
     /// <summary>
@@ -102,8 +96,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     /// </summary>
     void Start()
     {
-        gameInput.OnInteraction += GameInput_OnInteraction;
-        gameInput.OnInteractionAlternate += GameInput_OnInteractionAlternate;
+        GameInput.Instance.OnInteraction += GameInput_OnInteraction;
+        GameInput.Instance.OnInteractionAlternate += GameInput_OnInteractionAlternate;
     }
     
     /// <summary>
@@ -201,7 +195,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     /// </summary>
     public void HandleInteractions()
     {
-        Vector2 InputVector = gameInput.GetMovement_Normalized_Vector2();
+        Vector2 InputVector = GameInput.Instance.GetMovement_Normalized_Vector2();
         Vector3 movedir = new Vector3(InputVector.x, 0f, InputVector.y);
 
         if (movedir != Vector3.zero)
@@ -243,7 +237,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     /// </summary>
     public void HandleMovement()
     {
-        Vector2 InputVector = gameInput.GetMovement_Normalized_Vector2();
+        Vector2 InputVector = GameInput.Instance.GetMovement_Normalized_Vector2();
         Vector3 movedir = new Vector3(InputVector.x, 0f, InputVector.y);
 
         float moveDistance = moveSpeed * Time.deltaTime;
