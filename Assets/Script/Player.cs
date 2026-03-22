@@ -108,6 +108,11 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     /// </summary>
     private void Update()
     {
+        if (!IsOwner)
+        {
+            return;
+        }
+
         HandleMovement();
         HandleInteractions();
     }
@@ -223,7 +228,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
             SetSelectCounter(null);
         }
     }
-    
+
     /// <summary>
     /// 处理玩家移动逻辑
     /// 功能：根据输入向量移动玩家，使用胶囊体碰撞检测实现平滑移动和滑动效果
@@ -235,7 +240,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     /// 参数：无
     /// 返回值：无
     /// </summary>
-    public void HandleMovement()
+    private void HandleMovement()
     {
         Vector2 InputVector = GameInput.Instance.GetMovement_Normalized_Vector2();
         Vector3 movedir = new Vector3(InputVector.x, 0f, InputVector.y);
