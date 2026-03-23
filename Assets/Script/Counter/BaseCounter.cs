@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
@@ -126,6 +127,11 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
     public bool HasKitchenObject()
     {
         return (KitchenObject != null);
+    }
+
+public NetworkObject GetNetworkObject()
+    {
+        return null;
     }
     #endregion
 }
