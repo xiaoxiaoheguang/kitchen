@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
@@ -8,7 +9,7 @@ using UnityEngine;
 /// 实现 IKitchenObjectParent 接口，支持厨房物品的放置和获取
 /// 提供虚拟方法供子类重写交互逻辑
 /// </summary>
-public class BaseCounter : MonoBehaviour, IKitchenObjectParent
+public class BaseCounter : NetworkBehaviour, IKitchenObjectParent
 {
     #region 静态成员
     /// <summary>
@@ -36,7 +37,7 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
     /// </summary>
     [Tooltip("柜台顶部物品放置点")]
     [SerializeField] private Transform counterTopPoint;
-    
+
     /// <summary>
     /// 当前柜台上的厨房物品对象
     /// 为 null 时表示柜台上没有物品
@@ -55,7 +56,7 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
     {
         Debug.Log("Interact virtual");
     }
-    
+
     /// <summary>
     /// 备用交互方法，子类重写实现具体备用交互逻辑
     /// 功能：处理玩家与柜台的备用交互（切割、烹饪等）
@@ -90,11 +91,12 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
     {
         this.KitchenObject = kitchenObject;
 
-        if (kitchenObject != null) {
+        if (kitchenObject != null)
+        {
             OnAnyObjectSethere?.Invoke(this, EventArgs.Empty);
         }
     }
-    
+
     /// <summary>
     /// 获取柜台上的厨房物品
     /// 功能：返回当前柜台上的物品对象
@@ -105,7 +107,7 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
     {
         return KitchenObject;
     }
-    
+
     /// <summary>
     /// 清除柜台上的厨房物品
     /// 功能：将柜台上的物品设置为 null，表示柜台上不再有物品
@@ -116,7 +118,7 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
     {
         KitchenObject = null;
     }
-    
+
     /// <summary>
     /// 判断柜台上是否有厨房物品
     /// 功能：检查柜台上是否持有物品
@@ -126,6 +128,11 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
     public bool HasKitchenObject()
     {
         return (KitchenObject != null);
+    }
+
+    public NetworkObject GetNetworkObject()
+    {
+        return NetworkObject;
     }
     #endregion
 }

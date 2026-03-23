@@ -32,7 +32,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     /// </summary>
     [Tooltip("厨房物品持有点位置")]
     [SerializeField] private Transform kitchenObjectHoldPoint;
-    
+
     /// <summary>
     /// 当前玩家持有的厨房物品对象
     /// 为 null 时表示玩家未持有任何物品
@@ -50,13 +50,13 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     /// 参数：sender 为事件源，EventArgs 为空参数
     /// </summary>
     public event EventHandler OnPickSomething;
-    
+
     /// <summary>
     /// 选中柜台改变事件，当玩家选中或取消选中柜台时触发
     /// 参数：sender 为事件源，OnSelectedCounterChangedEventArgs 包含选中的柜台信息
     /// </summary>
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
-    
+
     /// <summary>
     /// 选中柜台改变事件的参数类
     /// 继承自 EventArgs，用于传递选中的柜台对象
@@ -68,6 +68,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
 
 
     static public event EventHandler OnAnyPlayerSpawned;
+    static public event EventHandler OnAnyPickedSomething;
 
     /// <summary>
     /// 玩家是否正在移动的标志
@@ -91,7 +92,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         //}
         //instance = this;
     }
-    
+
     override public void OnNetworkSpawn()
     {
         if (IsOwner)
@@ -112,7 +113,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         GameInput.Instance.OnInteraction += GameInput_OnInteraction;
         GameInput.Instance.OnInteractionAlternate += GameInput_OnInteractionAlternate;
     }
-    
+
     /// <summary>
     /// 每帧更新玩家状态
     /// 功能：处理玩家移动和与柜台的交互检测
@@ -140,7 +141,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     /// </summary>
     private void GameInput_OnInteractionAlternate(object sender, EventArgs e)
     {
-        if(!GameManager.Instance.IsGamePlaying())
+        if (!GameManager.Instance.IsGamePlaying())
         {
             return;
         }
@@ -149,7 +150,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
             selectCounter.InteractAlternate(this);
         }
     }
-    
+
     /// <summary>
     /// 处理主交互输入事件
     /// 功能：当玩家按下主交互键时，对当前选中的柜台执行主交互操作（如拾取、放置物品等）
@@ -208,7 +209,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
             selectedCounter = selectCounter,
         });
     }
-    
+
     /// <summary>
     /// 处理玩家与柜台的交互检测
     /// 功能：通过射线检测玩家前方是否有可交互的柜台，更新选中的柜台状态
@@ -238,7 +239,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
             }
             else
             {
-               SetSelectCounter(null);
+                SetSelectCounter(null);
             }
         }
         else
@@ -277,7 +278,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         {
             Vector3 movedirX = new Vector3(movedir.x, 0, 0);
 
-            bool canmoveX = Mathf.Abs(movedir.x)>0.5f
+            bool canmoveX = Mathf.Abs(movedir.x) > 0.5f
                 && !Physics.CapsuleCast(
                 transform.position,
                 transform.position + playHeight * Vector3.up,
@@ -330,7 +331,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     {
         return kitchenObjectHoldPoint;
     }
-    
+
     /// <summary>
     /// 设置当前持有的厨房物品
     /// 功能：更新玩家持有的物品对象，如果物品不为空则触发拾取事件
@@ -344,9 +345,10 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         if (this.KitchenObject != null)
         {
             OnPickSomething?.Invoke(this, EventArgs.Empty);
+            OnAnyPickedSomething?.Invoke(this, EventArgs.Empty);
         }
     }
-    
+
     /// <summary>
     /// 获取当前持有的厨房物品
     /// 功能：返回玩家当前持有的物品对象
@@ -357,7 +359,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     {
         return KitchenObject;
     }
-    
+
     /// <summary>
     /// 清除当前持有的厨房物品
     /// 功能：将玩家持有的物品设置为 null，表示不再持有任何物品
@@ -368,7 +370,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     {
         KitchenObject = null;
     }
-    
+
     /// <summary>
     /// 判断当前是否持有厨房物品
     /// 功能：检查玩家是否持有物品
@@ -379,5 +381,11 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     {
         return (KitchenObject != null);
     }
+
+    public NetworkObject GetNetworkObject()
+    {
+        return NetworkObject;
+    }
+
     #endregion
 }
