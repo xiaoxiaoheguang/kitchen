@@ -1,15 +1,33 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CounterSelect : MonoBehaviour
+public class CounterSelectVisual : MonoBehaviour
 {
     [SerializeField] private BaseCounter basecounter;
     [SerializeField] private GameObject[] visualGameObjectArray;
 
     void Start()
     {
-        //Player.instance.OnSelectedCounterChanged += Play_OnSelectedCounterChanged;
+        if (Player.LocalInstance != null)
+        {
+            Player.LocalInstance.OnSelectedCounterChanged += Play_OnSelectedCounterChanged;
+        }
+        else
+        {
+            Player.OnAnyPlayerSpawned += Player_OnAnyPlayerSpawned;
+        }
+
+    }
+
+    private void Player_OnAnyPlayerSpawned(object sender, EventArgs e)
+    {
+        if (Player.LocalInstance != null)
+        {
+            Player.LocalInstance.OnSelectedCounterChanged -= Player_OnAnyPlayerSpawned;
+            Player.LocalInstance.OnSelectedCounterChanged += Play_OnSelectedCounterChanged;
+        }
     }
 
     private void Play_OnSelectedCounterChanged(object sender, Player.OnSelectedCounterChangedEventArgs e)
@@ -21,7 +39,7 @@ public class CounterSelect : MonoBehaviour
         }
         else
         {
-             Show();
+            Show();
         }
     }
     private void Show()

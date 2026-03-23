@@ -16,7 +16,8 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     /// 玩家单例实例，用于全局访问玩家对象
     /// 在 Awake 中初始化，确保场景中只有一个玩家实例
     /// </summary>
-    //public static Player instance { get; private set; }
+    public static Player LocalInstance { get; private set; }
+
     #region 字段与属性
     /// <summary>
     /// 玩家移动速度，单位：米/秒
@@ -65,6 +66,9 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         public BaseCounter selectedCounter;
     }
 
+
+    static public event EventHandler OnAnyPlayerSpawned;
+
     /// <summary>
     /// 玩家是否正在移动的标志
     /// 用于动画系统控制播放状态
@@ -88,6 +92,15 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         //instance = this;
     }
     
+    override public void OnNetworkSpawn()
+    {
+        if (IsOwner)
+        {
+            LocalInstance = this;
+        }
+        OnAnyPlayerSpawned?.Invoke(this, EventArgs.Empty);
+    }
+
     /// <summary>
     /// 游戏开始时注册输入事件监听
     /// 功能：订阅游戏输入系统的交互和备用交互事件
@@ -166,6 +179,11 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     public bool IsWalking()
     {
         return isWalking;
+    }
+
+    static public void ResetStaticData()
+    {
+        OnAnyPlayerSpawned = null;
     }
     #endregion
 
