@@ -7,8 +7,9 @@ using UnityEngine.EventSystems;
 
 public class PlatesCounter : BaseCounter
 {
-    public event EventHandler OnplateSpawn;
-    public event EventHandler OnplateRemove;
+    public event EventHandler OnPlateSpawn;
+    public event EventHandler OnPlateRemove;
+
     [SerializeField] private KitchenObjectSO plateKitchenObjectSO;
 
     private float spawnPlateTimer;
@@ -18,6 +19,7 @@ public class PlatesCounter : BaseCounter
     private void Update()
     {
         if (!IsServer) return;
+
         spawnPlateTimer += Time.deltaTime;
 
         if (spawnPlateTimer > spawnPlateTimerMax)
@@ -26,8 +28,6 @@ public class PlatesCounter : BaseCounter
 
             if (GameManager.Instance.IsGamePlaying() && plateSpawnAmount < plateSpawnAmountMax)
             {
-                plateSpawnAmount++;
-
                 SpawnPlateServerRpc();
             }
         }
@@ -41,7 +41,8 @@ public class PlatesCounter : BaseCounter
     [ClientRpc]
     private void SpawnPlateClientRpc()
     {
-        OnplateSpawn?.Invoke(this, EventArgs.Empty);
+        plateSpawnAmount++;
+        OnPlateSpawn?.Invoke(this, EventArgs.Empty);
     }
 
     public override void Interact(Player player)
@@ -67,6 +68,6 @@ public class PlatesCounter : BaseCounter
     private void InteractLogicClientRpc()
     {
         plateSpawnAmount--;
-        OnplateRemove?.Invoke(this, EventArgs.Empty);
+        OnPlateRemove?.Invoke(this, EventArgs.Empty);
     }
 }
