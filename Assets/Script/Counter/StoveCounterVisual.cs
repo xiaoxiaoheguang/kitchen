@@ -16,7 +16,7 @@ public class StoveCounterVisual : MonoBehaviour
 
     private void StoveCounter_OnStateChanged(object sender, StoveCounter.OnStateChangedEventArgs e)
     {
-      bool showVisual=(e.State==StoveCounter.State.Cooking)||(e.State==StoveCounter.State.Cooked);
+      bool showVisual=(e.state==StoveCounter.State.Cooking)||(e.state==StoveCounter.State.Cooked);
 
         stoveOnGameObject.SetActive(showVisual);
         particlesGameObject.SetActive(showVisual);

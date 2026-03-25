@@ -355,7 +355,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     /// 参数：无
     /// 返回值：KitchenObject - 当前持有的物品，未持有时返回 null
     /// </summary>
-    public KitchenObject GetKitchenObject()
+    public KitchenObject GetKitchenObj()
     {
         return KitchenObject;
     }

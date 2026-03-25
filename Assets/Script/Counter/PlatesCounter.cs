@@ -51,7 +51,7 @@ public class PlatesCounter : BaseCounter
         {
             if (plateSpawnAmount > 0)
             {
-                KitchenObject.SpawKitchenObject(plateKitchenObjectSO, player);
+                KitchenObject.SpawKitchenObj(plateKitchenObjectSO, player);
 
                 InteractLogicServerRpc();
             }

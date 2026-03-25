@@ -13,11 +13,11 @@ public class DeliveryCounter : BaseCounter
     {
         if (player.HasKitchenObject())
         {
-            if (player.GetKitchenObject().TryGetPlate(out var plateKitchenObject))
+            if (player.GetKitchenObj().TryGetPlate(out var plateKitchenObject))
             {
                 DeliveryManager.Instance.DeliverRecipe(plateKitchenObject);
 
-                KitchenObject.DestroyKitchenObject(player.GetKitchenObject());
+                KitchenObject.DestroyKitchenObj(player.GetKitchenObj());
             }
         }
     }

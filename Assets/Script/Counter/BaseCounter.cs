@@ -103,7 +103,7 @@ public class BaseCounter : NetworkBehaviour, IKitchenObjectParent
     /// 参数：无
     /// 返回值：KitchenObject - 柜台上的物品，没有物品时返回 null
     /// </summary>
-    public KitchenObject GetKitchenObject()
+    public KitchenObject GetKitchenObj()
     {
         return KitchenObject;
     }

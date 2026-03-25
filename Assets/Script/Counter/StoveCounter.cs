@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using static CuttingCounter;
 using static IHasProgress;
@@ -41,7 +42,7 @@ public class StoveCounter : BaseCounter, IHasProgress
     public class OnStateChangedEventArgs : EventArgs
     {
         /// <summary>当前状态</summary>
-        public State State;
+        public State state;
     }
 
     #endregion
@@ -70,17 +71,17 @@ public class StoveCounter : BaseCounter, IHasProgress
     /// <summary>
     /// 当前烹饪状态
     /// </summary>
-    private State state;
+    private NetworkVariable<State> state = new NetworkVariable<State>(State.Idle);
 
     /// <summary>
     /// 烹饪计时器
     /// </summary>
-    [SerializeField] private float cookingTimer;
+    [SerializeField] private NetworkVariable<float> cookingTimer = new NetworkVariable<float>(0f);
 
     /// <summary>
     /// 烧焦计时器
     /// </summary>
-    [SerializeField] float burningTimer;
+    [SerializeField] private NetworkVariable<float> burningTimer = new NetworkVariable<float>(0f);
 
     /// <summary>
     /// 当前使用的烹饪配方
@@ -91,13 +92,58 @@ public class StoveCounter : BaseCounter, IHasProgress
 
     #region Unity Lifecycle
 
+    public override void OnNetworkSpawn()
+    {
+        cookingTimer.OnValueChanged += CookingTimer_OnValueChanged;
+        burningTimer.OnValueChanged += BurningTimer_OnValueChanged;
+        state.OnValueChanged += State_OnValueChanged;
+    }
+
+    private void State_OnValueChanged(State previousValue, State newValue)
+    {
+        OnStateChanged?.Invoke(this, new OnStateChangedEventArgs
+        {
+            state = state.Value
+        });
+
+        // 当状态变为 Idle 或 Burned 时，重置进度
+        if (state.Value == State.Idle || state.Value == State.Burned)
+        {
+            // 清空进度
+            OnProgressChange?.Invoke(this, new IHasProgress.OnProgressChangeEventArgs
+            {
+                progressNormalized = 0f
+            });
+        }
+    }
+
+    private void CookingTimer_OnValueChanged(float previousValue, float newValue)
+    {
+        float cookingTimeMax = cookingRecipeSO != null ? cookingRecipeSO.cookingTimeMax : 1f;
+        // 更新进度
+        OnProgressChange?.Invoke(this, new IHasProgress.OnProgressChangeEventArgs
+        {
+            progressNormalized = cookingTimer.Value / cookingTimeMax
+        });
+    }
+    private void BurningTimer_OnValueChanged(float previousValue, float newValue)
+    {
+        float burningTimeMax = cookingRecipeSO != null ? cookingRecipeSO.cookingTimeMax : 1f;
+        // 更新进度
+        OnProgressChange?.Invoke(this, new IHasProgress.OnProgressChangeEventArgs
+        {
+            progressNormalized = burningTimer.Value / burningTimeMax
+        });
+    }
+
     /// <summary>
     /// 初始化状态为空闲
     /// </summary>
     private void Start()
     {
-        state = State.Idle;
+        state.Value = State.Idle;
     }
+
 
     /// <summary>
     /// 每帧更新烹饪状态
@@ -109,9 +155,14 @@ public class StoveCounter : BaseCounter, IHasProgress
     /// </remarks>
     private void Update()
     {
+        if (!IsServer)
+        {
+            return;
+        }
+
         if (HasKitchenObject())
         {
-            switch (state)
+            switch (state.Value)
             {
                 case State.Idle:
                     // 空闲状态，不做处理
@@ -119,70 +170,47 @@ public class StoveCounter : BaseCounter, IHasProgress
 
                 case State.Cooking:
                     // 烹饪逻辑
-                    cookingTimer += Time.deltaTime;
-
-                    // 更新进度
-                    OnProgressChange?.Invoke(this, new IHasProgress.OnProgressChangeEventArgs
-                    {
-                        progressNormalized = cookingTimer / cookingRecipeSO.cookingTimeMax
-                    });
+                    cookingTimer.Value += Time.deltaTime;
 
                     // 检查是否烹饪完成
-                    if (cookingTimer > cookingRecipeSO.cookingTimeMax)
+                    if (cookingTimer.Value > cookingRecipeSO.cookingTimeMax)
                     {
-                        cookingTimer = 0f;
-
                         // 销毁原始物品，生成煎好的物品
-                        GetKitchenObject().DestroySelf();
-                        KitchenObject.SpawKitchenObject(cookingRecipeSO.output, this);
+                        KitchenObject.DestroyKitchenObj(GetKitchenObj());
+
+                        KitchenObject.SpawKitchenObj(cookingRecipeSO.output, this);
 
                         // 切换到煎好状态
-                        state = State.Cooked;
+                        state.Value = State.Cooked;
 
-                        OnStateChanged?.Invoke(this, new OnStateChangedEventArgs
-                        {
-                            State = state
-                        });
+                        // 初始化烧焦计时和配方
+                        burningTimer.Value = 0f;
+
+                        SetCookRecipeSOClientRpc(
+                            KitchenMultiplayerGame.Instance.GetKitchenObjSOIndex(
+                                GetKitchenObj().GetKitchenObjSO()));
+
+        
+
                     }
-
-                    // 初始化烧焦计时和配方
-                    burningTimer = 0f;
-                    cookingRecipeSO = GetCookingRecipeSOFromInput(GetKitchenObject().GetKitchenObjectSO());
-
                     break;
 
                 case State.Cooked:
                     // 烧焦逻辑
-                    burningTimer += Time.deltaTime;
-
-                    // 更新进度
-                    OnProgressChange?.Invoke(this, new IHasProgress.OnProgressChangeEventArgs
-                    {
-                        progressNormalized = burningTimer / cookingRecipeSO.cookingTimeMax
-                    });
+                    burningTimer.Value += Time.deltaTime;
 
                     // 检查是否烧焦完成
-                    if (burningTimer > cookingRecipeSO.cookingTimeMax)
+                    if (burningTimer.Value > cookingRecipeSO.cookingTimeMax)
                     {
-                        burningTimer = 0f;
+                        burningTimer.Value = 0f;
 
                         // 销毁煎好的物品，生成烧焦的物品
-                        GetKitchenObject().DestroySelf();
-                        KitchenObject.SpawKitchenObject(cookingRecipeSO.output, this);
+                        KitchenObject.DestroyKitchenObj(GetKitchenObj());
+                        KitchenObject.SpawKitchenObj(cookingRecipeSO.output, this);
 
                         // 切换到烧焦状态
-                        state = State.Burned;
+                        state.Value = State.Burned;
 
-                        OnStateChanged?.Invoke(this, new OnStateChangedEventArgs
-                        {
-                            State = state
-                        });
-
-                        // 清空进度
-                        OnProgressChange?.Invoke(this, new IHasProgress.OnProgressChangeEventArgs
-                        {
-                            progressNormalized = 0f
-                        });
                     }
 
                     break;
@@ -215,27 +243,15 @@ public class StoveCounter : BaseCounter, IHasProgress
             // 柜台没有物品
             if (player.HasKitchenObject())
             {
-                if (HasRecipeInput(player.GetKitchenObject().GetKitchenObjectSO()))
+                if (HasRecipeInput(player.GetKitchenObj().GetKitchenObjSO()))
                 {
                     // 玩家拿着可以烹饪的物品
-                    player.GetKitchenObject().SetKitchenObjectParent(this);
+                    KitchenObject kitchenObject = player.GetKitchenObj();
+                    kitchenObject.SetKitchenObjectParent(this);
 
-                    // 初始化烹饪状态
-                    cookingRecipeSO = GetCookingRecipeSOFromInput(GetKitchenObject().GetKitchenObjectSO());
-                    state = State.Cooking;
-                    cookingTimer = 0f;
+                    InteractLogicPlaceObjectOnCounterServerRpc(
+                        KitchenMultiplayerGame.Instance.GetKitchenObjSOIndex(kitchenObject.GetKitchenObjSO()));
 
-                    // 触发状态变化事件
-                    OnStateChanged?.Invoke(this, new OnStateChangedEventArgs
-                    {
-                        State = state
-                    });
-
-                    // 初始化进度
-                    OnProgressChange?.Invoke(this, new IHasProgress.OnProgressChangeEventArgs
-                    {
-                        progressNormalized = cookingTimer / cookingRecipeSO.cookingTimeMax
-                    });
                 }
             }
         }
@@ -245,46 +261,49 @@ public class StoveCounter : BaseCounter, IHasProgress
             if (!player.HasKitchenObject())
             {
                 // 玩家没拿物品，取走柜台物品
-                GetKitchenObject().SetKitchenObjectParent(player);
-                state = State.Idle;
-
-                OnStateChanged?.Invoke(this, new OnStateChangedEventArgs
-                {
-                    State = state
-                });
-
-                OnProgressChange?.Invoke(this, new IHasProgress.OnProgressChangeEventArgs
-                {
-                    progressNormalized = 0f
-                });
+                GetKitchenObj().SetKitchenObjectParent(player);
+                SetStateIdelServerRpc();
             }
             else
             {
                 // 玩家拿着物品
-                if (player.GetKitchenObject().TryGetPlate(out PlateKitchenObject plateKitchenObject))
+                if (player.GetKitchenObj().TryGetPlate(out PlateKitchenObject plateKitchenObject))
                 {
                     // 玩家拿着盘子
-                    if (plateKitchenObject.TryAddIngredient(GetKitchenObject().GetKitchenObjectSO()))
+                    if (plateKitchenObject.TryAddIngredient(GetKitchenObj().GetKitchenObjSO()))
                     {
                         // 将柜台物品添加到盘子上
-                        GetKitchenObject().DestroySelf();
+                        GetKitchenObj().DestroySelf();
 
                         // 重置状态
-                        state = State.Idle;
+                        state.Value = State.Idle;
 
-                        OnStateChanged?.Invoke(this, new OnStateChangedEventArgs
-                        {
-                            State = state
-                        });
-
-                        OnProgressChange?.Invoke(this, new IHasProgress.OnProgressChangeEventArgs
-                        {
-                            progressNormalized = 0f
-                        });
                     }
                 }
             }
         }
+    }
+
+    [ServerRpc(RequireOwnership =false)]
+    private void SetStateIdelServerRpc()
+    {
+        state.Value = State.Idle;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void InteractLogicPlaceObjectOnCounterServerRpc(int kitchenObjectSOIndex)
+    {
+        cookingTimer.Value = 0f;
+        state.Value = State.Cooking;
+        SetCookRecipeSOClientRpc(kitchenObjectSOIndex);
+    }
+
+    [ClientRpc]
+    private void SetCookRecipeSOClientRpc(int kitchenObjectSOIndex)
+    {
+        KitchenObjectSO kitchenObjectSO = KitchenMultiplayerGame.Instance.GetKitchenObjectSOFromIndex(kitchenObjectSOIndex);
+        // 初始化烹饪状态
+        cookingRecipeSO = GetCookingRecipeSOFromInput(kitchenObjectSO);
     }
 
     /// <summary>
@@ -294,6 +313,15 @@ public class StoveCounter : BaseCounter, IHasProgress
     public override void InteractAlternate(Player player)
     {
         // 备用交互功能暂未实现
+    }
+
+    /// <summary>
+    /// 检查当前是否处于煎好状态
+    /// </summary>
+    /// <returns>如果处于煎好状态返回 true，否则返回 false</returns>
+    public bool IsFried()
+    {
+        return state.Value == State.Cooked;
     }
 
     #endregion
@@ -344,15 +372,6 @@ public class StoveCounter : BaseCounter, IHasProgress
             }
         }
         return null;
-    }
-
-    /// <summary>
-    /// 检查当前是否处于煎好状态
-    /// </summary>
-    /// <returns>如果处于煎好状态返回 true，否则返回 false</returns>
-    public bool IsFried()
-    {
-        return state == State.Cooked;
     }
 
     #endregion

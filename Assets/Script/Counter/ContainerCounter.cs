@@ -14,7 +14,7 @@ public class ContainerCounter : BaseCounter
     {
         if (!player.HasKitchenObject())
         {
-            KitchenObject.SpawKitchenObject(ContainKitchenObjectSO, player);
+            KitchenObject.SpawKitchenObj(ContainKitchenObjectSO, player);
             //Transform kitchenObjectTransform = Instantiate(KitchenObjectSO.prefab);
             //kitchenObjectTransform.GetComponent<KitchenObject>().SetKitchenObjectParent(player);
 

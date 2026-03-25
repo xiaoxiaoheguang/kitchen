@@ -11,7 +11,7 @@ public class KitchenObject : NetworkBehaviour
     private IKitchenObjectParent kitchenObjectParent;
     private FollowTransform followTransform;
 
-    public KitchenObjectSO GetKitchenObjectSO() { return kitchenObjectSO; }
+    public KitchenObjectSO GetKitchenObjSO() { return kitchenObjectSO; }
 
     protected virtual void Awake()
     {
@@ -78,12 +78,12 @@ public class KitchenObject : NetworkBehaviour
             return false;
         }
     }
-    public static void SpawKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent)
+    public static void SpawKitchenObj(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent)
     {
         KitchenMultiplayerGame.Instance.SpawKitchenObject(kitchenObjectSO, kitchenObjectParent);
     }
 
-    public static void DestroyKitchenObject(KitchenObject kitchenObject)
+    public static void DestroyKitchenObj(KitchenObject kitchenObject)
     {
         KitchenMultiplayerGame.Instance.DestroyKitchenObject(kitchenObject);
     }
