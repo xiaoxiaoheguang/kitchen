@@ -19,6 +19,8 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     public static Player LocalInstance { get; private set; }
 
     #region 字段与属性
+    [SerializeField] private LayerMask countersLayerMask;
+    [SerializeField] private LayerMask collisionsLayerMask;
     /// <summary>
     /// 玩家移动速度，单位：米/秒
     /// 用于控制玩家在场景中的移动速率
@@ -33,11 +35,14 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     [Tooltip("厨房物品持有点位置")]
     [SerializeField] private Transform kitchenObjectHoldPoint;
 
+
     /// <summary>
     /// 当前玩家持有的厨房物品对象
     /// 为 null 时表示玩家未持有任何物品
     /// </summary>
     [SerializeField] private KitchenObject KitchenObject;
+
+    [SerializeField] private List<Vector3> spawnPositionList;
 
     /// <summary>
     /// 当前玩家选中的柜台对象
@@ -99,6 +104,9 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         {
             LocalInstance = this;
         }
+
+        transform.position = spawnPositionList[(int)OwnerClientId];
+
         OnAnyPlayerSpawned?.Invoke(this, EventArgs.Empty);
     }
 
@@ -228,7 +236,12 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         }
 
         float interactDistance = 1f;
-        if (Physics.Raycast(transform.position, lastInteractionDir, out RaycastHit raycastHit, interactDistance))
+        if (Physics.Raycast(
+            transform.position,
+            lastInteractionDir,
+            out RaycastHit raycastHit,
+            interactDistance,
+            countersLayerMask))
         {
             if (raycastHit.transform.TryGetComponent(out BaseCounter basecounter))
             {
@@ -265,26 +278,28 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         Vector3 movedir = new Vector3(InputVector.x, 0f, InputVector.y);
 
         float moveDistance = moveSpeed * Time.deltaTime;
-        float playRadius = .6f;
+        float playerRadius = .6f;
         float playHeight = 2f;
 
-        bool canmove = !Physics.CapsuleCast(transform.position,
-            transform.position + playHeight * Vector3.up,
-            playRadius,
+        bool canmove = !Physics.BoxCast(transform.position,
+            playerRadius * Vector3.one,
             movedir,
-            moveDistance);
+            Quaternion.identity,
+            moveDistance,
+            collisionsLayerMask);
 
         if (!canmove)
         {
             Vector3 movedirX = new Vector3(movedir.x, 0, 0);
 
             bool canmoveX = Mathf.Abs(movedir.x) > 0.5f
-                && !Physics.CapsuleCast(
+                && !Physics.BoxCast(
                 transform.position,
-                transform.position + playHeight * Vector3.up,
-                playRadius,
+                Vector3.one * playerRadius,
                 movedirX,
-                moveDistance);
+                Quaternion.identity,
+                moveDistance,
+                collisionsLayerMask);
 
             if (canmoveX)
             {
@@ -295,12 +310,13 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
                 Vector3 movedirZ = new Vector3(0, 0, movedir.z);
 
                 bool canmoveZ = Mathf.Abs(movedir.z) > 0.5f
-                    && !Physics.CapsuleCast(
+                    && !Physics.BoxCast(
                     transform.position,
-                    transform.position + playHeight * Vector3.up,
-                    playRadius,
+                    Vector3.one * playerRadius,
                     movedirZ,
-                    moveDistance);
+                    Quaternion.identity,
+                    moveDistance,
+                    collisionsLayerMask);
 
                 if (canmoveZ)
                 {
