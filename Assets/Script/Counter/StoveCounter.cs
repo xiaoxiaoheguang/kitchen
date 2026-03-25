@@ -202,17 +202,17 @@ public class StoveCounter : BaseCounter, IHasProgress
                     // 检查是否烧焦完成
                     if (burningTimer.Value > cookingRecipeSO.cookingTimeMax)
                     {
-                        burningTimer.Value = 0f;
-
                         // 销毁煎好的物品，生成烧焦的物品
                         KitchenObject.DestroyKitchenObj(GetKitchenObj());
                         KitchenObject.SpawKitchenObj(cookingRecipeSO.output, this);
+
+                        // 重置计时器
+                        burningTimer.Value = 0f;
 
                         // 切换到烧焦状态
                         state.Value = State.Burned;
 
                     }
-
                     break;
 
                 case State.Burned:
@@ -257,14 +257,7 @@ public class StoveCounter : BaseCounter, IHasProgress
         }
         else
         {
-            // 柜台有物品
-            if (!player.HasKitchenObject())
-            {
-                // 玩家没拿物品，取走柜台物品
-                GetKitchenObj().SetKitchenObjectParent(player);
-                SetStateIdelServerRpc();
-            }
-            else
+            if (player.HasKitchenObject())
             {
                 // 玩家拿着物品
                 if (player.GetKitchenObj().TryGetPlate(out PlateKitchenObject plateKitchenObject))
@@ -272,14 +265,19 @@ public class StoveCounter : BaseCounter, IHasProgress
                     // 玩家拿着盘子
                     if (plateKitchenObject.TryAddIngredient(GetKitchenObj().GetKitchenObjSO()))
                     {
-                        // 将柜台物品添加到盘子上
-                        GetKitchenObj().DestroySelf();
+                        KitchenObject.DestroyKitchenObj(GetKitchenObj());
 
                         // 重置状态
-                        state.Value = State.Idle;
+                        SetStateIdelServerRpc();
 
                     }
                 }
+            }
+            else
+            {
+                // 玩家没拿物品，取走柜台物品
+                GetKitchenObj().SetKitchenObjectParent(player);
+                SetStateIdelServerRpc();
             }
         }
     }
@@ -288,6 +286,8 @@ public class StoveCounter : BaseCounter, IHasProgress
     private void SetStateIdelServerRpc()
     {
         state.Value = State.Idle;
+        burningTimer.Value = 0f;
+        cookingTimer.Value = 0f;
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -301,7 +301,7 @@ public class StoveCounter : BaseCounter, IHasProgress
     [ClientRpc]
     private void SetCookRecipeSOClientRpc(int kitchenObjectSOIndex)
     {
-        KitchenObjectSO kitchenObjectSO = KitchenMultiplayerGame.Instance.GetKitchenObjectSOFromIndex(kitchenObjectSOIndex);
+        KitchenObjectSO kitchenObjectSO = KitchenMultiplayerGame.Instance.GetKitchenObjSOFromIndex(kitchenObjectSOIndex);
         // 初始化烹饪状态
         cookingRecipeSO = GetCookingRecipeSOFromInput(kitchenObjectSO);
     }

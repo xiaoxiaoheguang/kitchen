@@ -92,31 +92,19 @@ public class CuttingCounter : BaseCounter, IHasProgress
         }
         else
         {
-            // 柜台上有物品，玩家没有物品，拾取柜台上的物品
-            if (!player.HasKitchenObject())
+            if (player.HasKitchenObject())
             {
-                GetKitchenObj().SetKitchenObjectParent(player);
-            }
-            else
-            {
-                // 双方都有物品，尝试将食材添加到盘子上
                 if (player.GetKitchenObj().TryGetPlate(out PlateKitchenObject plateKitchenObject))
                 {
                     if (plateKitchenObject.TryAddIngredient(GetKitchenObj().GetKitchenObjSO()))
                     {
-                        GetKitchenObj().DestroySelf();
+                        KitchenObject.DestroyKitchenObj(GetKitchenObj());
                     }
                 }
-                else
-                {
-                    if (GetKitchenObj().TryGetPlate(out plateKitchenObject))
-                    {
-                        if (plateKitchenObject.TryAddIngredient(player.GetKitchenObj().GetKitchenObjSO()))
-                        {
-                            player.GetKitchenObj().DestroySelf();
-                        }
-                    }
-                }
+            }
+            else
+            {
+                GetKitchenObj().SetKitchenObjectParent(player);
             }
         }
     }
