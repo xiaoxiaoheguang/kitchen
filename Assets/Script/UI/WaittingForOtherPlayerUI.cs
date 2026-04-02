@@ -16,7 +16,6 @@ public class WaittingForOtherPlayerUI : MonoBehaviour
         if (GameManager.Instance.IsCountdownToStartActive())
         {
             Hide();
-
         }
     }
 

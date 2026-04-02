@@ -98,7 +98,7 @@ public class OptionUI : MonoBehaviour
     }
     private void Start()
     {
-        GameManager.Instance.OnResumeGame += OptionUI_OnPauseGame;
+        GameManager.Instance.OnLocalGameResume += OptionUI_OnPauseGame;
         UpdateVisual();
 
         Hide();

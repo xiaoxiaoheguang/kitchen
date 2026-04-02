@@ -12,15 +12,18 @@ using UnityEngine;
 /// 管理游戏的等待开始、倒计时、游戏中、游戏结束等状态
 /// 实现暂停/继续功能，并提供状态查询接口
 /// </remarks>
-public class GameManager : NetworkBehaviour 
+public class GameManager : NetworkBehaviour
 {
     #region Singleton & Events
 
     public static GameManager Instance { get; private set; }
 
     public event EventHandler OnStateChanged;
-    public event EventHandler OnPauseGame;
-    public event EventHandler OnResumeGame;
+    public event EventHandler OnLocalGamePause;
+    public event EventHandler OnLocalGameResume;
+    public event EventHandler OnMultiplayGamePause;
+    public event EventHandler OnMultiplayGameResume;
+
     public event EventHandler OnLocalPlayerReadyChanged;
 
     #endregion
@@ -39,18 +42,20 @@ public class GameManager : NetworkBehaviour
 
     #region Private Fields
 
-    private NetworkVariable<State> state=new NetworkVariable<State>(State.WaitingToStart); 
+    private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
+
     private bool isLocalPlayerReady = false;
+    private bool isLocalGamePause = false;
+
+    private NetworkVariable<bool> isPause = new NetworkVariable<bool>(false);
 
     private Dictionary<ulong, bool> playerReadyMap;
+    private Dictionary<ulong, bool> playerPausedMap;
 
     private NetworkVariable<float> countdownTimer = new NetworkVariable<float>(3f);
+    private NetworkVariable<float> gameplayTimer = new NetworkVariable<float>(0f);
 
-    private NetworkVariable<float> gameplayTimer =new NetworkVariable<float>(0f);
-
-    private float gameplayTimerMax = 10f;//300f;
-
-    private bool isPause = false;
+    private float gameplayTimerMax = 90f;
 
     #endregion
 
@@ -61,6 +66,7 @@ public class GameManager : NetworkBehaviour
         Instance = this;
 
         playerReadyMap = new Dictionary<ulong, bool>();
+        playerPausedMap = new Dictionary<ulong, bool>();
     }
 
 
@@ -72,12 +78,12 @@ public class GameManager : NetworkBehaviour
 
     private void Update()
     {
-        if(!IsServer)
+        if (!IsServer)
         {
             return;
         }
 
-        switch (state.Value) 
+        switch (state.Value)
         {
             case State.WaitingToStart:
                 break;
@@ -106,13 +112,26 @@ public class GameManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        state.OnValueChanged += State_OnValueChanged; 
+        state.OnValueChanged += State_OnValueChanged;
+        isPause.OnValueChanged += IsPause_OnValueChanged;
+    }
+
+    private void IsPause_OnValueChanged(bool previousValue, bool newValue)
+    {
+        if(isPause.Value)
+        {
+            Time.timeScale = 0f;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
     }
 
     private void State_OnValueChanged(State oldValue, State newValue)
     {
         OnStateChanged?.Invoke(this, EventArgs.Empty);
-    } 
+    }
 
     #endregion
 
@@ -120,25 +139,24 @@ public class GameManager : NetworkBehaviour
 
     private void GameInput_OnInteraction(object sender, EventArgs e)
     {
-        if (state.Value == State.WaitingToStart) 
+        if (state.Value == State.WaitingToStart)
         {
             isLocalPlayerReady = true;
+            OnLocalPlayerReadyChanged?.Invoke(this, EventArgs.Empty);
 
             SetPlayerReadyServerRpc();
-
-            OnLocalPlayerReadyChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SetPlayerReadyServerRpc(ServerRpcParams serverRpcParams=default) 
+    private void SetPlayerReadyServerRpc(ServerRpcParams serverRpcParams = default)
     {
-        playerReadyMap[serverRpcParams.Receive.SenderClientId] = true;  
+        playerReadyMap[serverRpcParams.Receive.SenderClientId] = true;
 
-        bool isAllClientsReady =true;
-        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds) 
+        bool isAllClientsReady = true;
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            if (!playerReadyMap.ContainsKey(clientId)|| !playerReadyMap[clientId])
+            if (!playerReadyMap.ContainsKey(clientId) || !playerReadyMap[clientId])
             {
                 isAllClientsReady = false;
                 break;
@@ -150,7 +168,7 @@ public class GameManager : NetworkBehaviour
             state.Value = State.CountdownToStart;
         }
 
-    } 
+    }
 
     private void GameInput_OnPauseAction(object sender, EventArgs e)
     {
@@ -163,18 +181,50 @@ public class GameManager : NetworkBehaviour
 
     public void PauseGame()
     {
-        isPause = !isPause;
-        if (isPause)
+        isLocalGamePause = !isLocalGamePause;
+        if (isLocalGamePause)
         {
-            Time.timeScale = 0f;
-            OnPauseGame?.Invoke(this, EventArgs.Empty);
+            PauseGameServerRpc();
+
+            OnMultiplayGamePause?.Invoke(this, EventArgs.Empty);
         }
         else
         {
-            Time.timeScale = 1f;
-            OnResumeGame?.Invoke(this, EventArgs.Empty);
+            ResumeGameServerRpc();
+
+            OnMultiplayGameResume?.Invoke(this, EventArgs.Empty);
         }
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PauseGameServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        playerPausedMap[serverRpcParams.Receive.SenderClientId] = true;
+        TestGamePauseState();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ResumeGameServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        playerPausedMap[serverRpcParams.Receive.SenderClientId] = false;
+        TestGamePauseState();
+    }
+
+    private void TestGamePauseState()
+    {
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            if (playerPausedMap.ContainsKey(clientId) && playerPausedMap[clientId])
+            {
+                // 只要有一个玩家处于暂停状态，游戏就应该处于暂停状态
+                isPause.Value = true;
+                return;
+            }
+        }
+        // 没有玩家处于暂停状态，游戏应该继续
+        isPause.Value = false;
+    }
+
 
     public bool IsCountdownToStartActive()
     {
