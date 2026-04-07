@@ -57,6 +57,8 @@ public class GameManager : NetworkBehaviour
 
     private float gameplayTimerMax = 90f;
 
+    private bool autoTestGamePauseState;
+
     #endregion
 
     #region Unity Lifecycle
@@ -110,10 +112,29 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        if (autoTestGamePauseState)
+        {
+            autoTestGamePauseState = false;
+            TestGamePauseState();
+        }
+    }
+
     public override void OnNetworkSpawn()
     {
         state.OnValueChanged += State_OnValueChanged;
         isPause.OnValueChanged += IsPause_OnValueChanged;
+
+        if (IsServer)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback += NetworkManger_ClientConnectedCallback;
+        }
+    }
+
+    private void NetworkManger_ClientConnectedCallback(ulong obj)
+    {
+        autoTestGamePauseState = true;
     }
 
     private void IsPause_OnValueChanged(bool previousValue, bool newValue)
@@ -121,10 +142,12 @@ public class GameManager : NetworkBehaviour
         if(isPause.Value)
         {
             Time.timeScale = 0f;
+            OnMultiplayGamePause?.Invoke(this, EventArgs.Empty);
         }
         else
         {
             Time.timeScale = 1f;
+            OnMultiplayGameResume?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -186,13 +209,13 @@ public class GameManager : NetworkBehaviour
         {
             PauseGameServerRpc();
 
-            OnMultiplayGamePause?.Invoke(this, EventArgs.Empty);
+            OnLocalGamePause?.Invoke(this, EventArgs.Empty);
         }
         else
         {
             ResumeGameServerRpc();
 
-            OnMultiplayGameResume?.Invoke(this, EventArgs.Empty);
+            OnLocalGameResume?.Invoke(this, EventArgs.Empty);
         }
     }
 

@@ -4,12 +4,12 @@ using UnityEngine;
 public class PauseMultiplayUI : MonoBehaviour
 {
 
-        private void Start()
-        {
-            GameManager.Instance.OnMultiplayGamePause += GameManager_OnMultiplayGamePause;
-            GameManager.Instance.OnMultiplayGameResume += GameManager_OnMultiplayGameResume;
-    
-            Hide();
+    private void Start()
+    {
+        GameManager.Instance.OnMultiplayGamePause += GameManager_OnMultiplayGamePause;
+        GameManager.Instance.OnMultiplayGameResume += GameManager_OnMultiplayGameResume;
+
+        Hide();
     }
 
     private void GameManager_OnMultiplayGameResume(object sender, EventArgs e)
