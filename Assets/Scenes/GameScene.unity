@@ -1840,12 +1840,12 @@ RectTransform:
   - {fileID: 371668352}
   - {fileID: 306065810}
   - {fileID: 326326126}
+  - {fileID: 458923061}
   - {fileID: 730769971}
   - {fileID: 539478478}
   - {fileID: 1634259968}
   - {fileID: 1651027187}
   - {fileID: 591289664}
-  - {fileID: 458923061}
   - {fileID: 871263447}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3540,7 +3540,7 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 44d070edcdb718346a76b9ef165ba583, type: 2}
     TickRate: 30
     ClientConnectionBufferTimeout: 10
-    ConnectionApproval: 0
+    ConnectionApproval: 1
     ConnectionData: 
     EnableTimeResync: 0
     TimeResyncInterval: 30
@@ -14774,7 +14774,7 @@ PrefabInstance:
     - target: {fileID: 4845276930943762971, guid: 2da3dcc22749e7f4280737786d898334,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000045776367
+      value: 0.000076293945
       objectReference: {fileID: 0}
     - target: {fileID: 4845637959249703711, guid: 2da3dcc22749e7f4280737786d898334,
         type: 3}

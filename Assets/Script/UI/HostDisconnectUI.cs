@@ -11,20 +11,31 @@ public class HostDisconnectUI : MonoBehaviour
     {
         playAgainButton.onClick.AddListener(() =>
         {
-            NetworkManager.Singleton.Shutdown();
             Loader.Load(Loader.Scene.MainMenuScene);
         });
     }
 
     private void Start()
     {
-        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnect;
+        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
         Hide();
     }
 
-    private void NetworkManager_OnClientDisconnect(ulong clientId)
+    private void OnDestroy()
     {
-        Show();
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientDisconnectCallback -= NetworkManager_OnClientDisconnectCallback;
+        }
+    }
+
+    private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
+    {
+        if (clientId == NetworkManager.Singleton.LocalClientId)
+        {
+            Show();
+            Debug.Log("Server is shutting down");
+        }
     }
 
     private void Show()
@@ -36,5 +47,4 @@ public class HostDisconnectUI : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
-
 }
