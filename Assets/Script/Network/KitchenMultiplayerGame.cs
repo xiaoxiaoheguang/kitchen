@@ -11,6 +11,8 @@ public class KitchenMultiplayerGame : NetworkBehaviour
     void Awake()
     {
         Instance = this;
+
+        DontDestroyOnLoad(gameObject);
     }
     public void StartHost()
     {
@@ -21,15 +23,7 @@ public class KitchenMultiplayerGame : NetworkBehaviour
 
     private void NetworkManager_ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
     {
-        if(GameManager.Instance.IsWaitingToStart())
-        {
-            response.Approved = true;
-            response.CreatePlayerObject = true;
-        }
-        else
-        {
-            response.Approved = false;
-        }
+        response.Approved = true;
 
     }
 
@@ -44,7 +38,7 @@ public class KitchenMultiplayerGame : NetworkBehaviour
         SpawKitchenObjectServerRpc(GetKitchenObjSOIndex(kitchenObjectSO), kitchenObjectParent.GetNetworkObject());
     }
 
-    [ServerRpc(RequireOwnership =false)]
+    [ServerRpc(RequireOwnership = false)]
     public void SpawKitchenObjectServerRpc(int kitchenObjectSOIndex, NetworkObjectReference kitchenObjParentNetworkObjRef)
     {
         // 由于ServerRpc只能传递基本类型和序列化类型，所以我们传递KitchenObjectSO的索引来获取对应的KitchenObjectSO对象。
