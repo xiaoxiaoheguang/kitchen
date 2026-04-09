@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 /// <summary>
@@ -58,6 +59,8 @@ public class GameManager : NetworkBehaviour
     private float gameplayTimerMax = 90f;
 
     private bool autoTestGamePauseState;
+
+    [SerializeField] private Transform playerPrefab;
 
     #endregion
 
@@ -129,6 +132,16 @@ public class GameManager : NetworkBehaviour
         if (IsServer)
         {
             NetworkManager.Singleton.OnClientConnectedCallback += NetworkManger_ClientConnectedCallback;
+            NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SceneManager_OnLoadEventCompleted;
+        }
+    }
+
+    private void SceneManager_OnLoadEventCompleted(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
+    {
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            Transform playerTransform = Instantiate(playerPrefab);
+            playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
     }
 
@@ -139,7 +152,7 @@ public class GameManager : NetworkBehaviour
 
     private void IsPause_OnValueChanged(bool previousValue, bool newValue)
     {
-        if(isPause.Value)
+        if (isPause.Value)
         {
             Time.timeScale = 0f;
             OnMultiplayGamePause?.Invoke(this, EventArgs.Empty);

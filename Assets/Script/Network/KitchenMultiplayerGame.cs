@@ -1,10 +1,16 @@
 using System;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class KitchenMultiplayerGame : NetworkBehaviour
 {
+    [SerializeField] private int MAX_PLAYERCOUNT = 4;
     public static KitchenMultiplayerGame Instance { get; private set; }
+
+    public event EventHandler OnTryingToJoinGame;
+    public event EventHandler OnFailedToJoinGame;
+
 
     public KitchenObjectListSO kitchenObjectListSO;
 
@@ -23,12 +29,30 @@ public class KitchenMultiplayerGame : NetworkBehaviour
 
     private void NetworkManager_ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
     {
-        response.Approved = true;
+        if (SceneManager.GetActiveScene().name != Loader.Scene.CharacterSelectScene.ToString())
+        {
+            response.Approved = false;
+            response.Reason = "Game has already started!";
+            return;
+        }
 
+        if (NetworkManager.Singleton.ConnectedClientsIds.Count >= MAX_PLAYERCOUNT)
+        {
+            response.Approved = false;
+            response.Reason = "Game is full!";
+            return;
+        }
+        response.Approved = true;
     }
 
     public void StartClient()
     {
+        OnTryingToJoinGame?.Invoke(this, EventArgs.Empty);
+
+        NetworkManager.Singleton.OnClientDisconnectCallback += (ulong clientId) =>
+        {
+            OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
+        };
         NetworkManager.Singleton.StartClient();
 
     }
@@ -41,7 +65,7 @@ public class KitchenMultiplayerGame : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void SpawKitchenObjectServerRpc(int kitchenObjectSOIndex, NetworkObjectReference kitchenObjParentNetworkObjRef)
     {
-        // 由于ServerRpc只能传递基本类型和序列化类型，所以我们传递KitchenObjectSO的索引来获取对应的KitchenObjectSO对象。
+        // 锟斤拷锟斤拷ServerRpc只锟杰达拷锟捷伙拷锟斤拷锟斤拷锟酵猴拷锟斤拷锟叫伙拷锟斤拷锟酵ｏ拷锟斤拷锟斤拷锟斤拷锟角达拷锟斤拷KitchenObjectSO锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷取锟斤拷应锟斤拷KitchenObjectSO锟斤拷锟斤拷
         KitchenObjectSO kitchenObjectSO = GetKitchenObjSOFromIndex(kitchenObjectSOIndex);
 
         Transform kitchenObjectTransform = Instantiate(kitchenObjectSO.prefab);
