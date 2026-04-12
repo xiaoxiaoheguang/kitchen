@@ -1,10 +1,14 @@
+using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CharacterSelectReady : NetworkBehaviour
 {
     public static CharacterSelectReady Instance { get; private set; }
+
+    public event EventHandler OnReadyChanged;
 
     private Dictionary<ulong, bool> playerReadyMap;
 
@@ -23,6 +27,8 @@ public class CharacterSelectReady : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void SetPlayerReadyServerRpc(ServerRpcParams serverRpcParams = default)
     {
+        SetPlayerReadyClientRpc(serverRpcParams.Receive.SenderClientId);
+
         playerReadyMap[serverRpcParams.Receive.SenderClientId] = true;
 
         bool isAllClientsReady = true;
@@ -40,5 +46,18 @@ public class CharacterSelectReady : NetworkBehaviour
             Loader.LoadNetwork(Loader.Scene.GameScene);
         }
 
+    }
+
+    [ClientRpc]
+    private void SetPlayerReadyClientRpc(ulong clientId)
+    {
+        playerReadyMap[clientId] = true;
+
+        OnReadyChanged?.Invoke(this, new EventArgs());
+    }
+
+    public bool IsPlayerReady(ulong clientId)
+    {
+        return playerReadyMap.ContainsKey(clientId) && playerReadyMap[clientId];
     }
 }
