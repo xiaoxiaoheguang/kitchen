@@ -39,9 +39,22 @@ public class KitchenMultiplayerGame : NetworkBehaviour
     {
         NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
         NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Host_OnClientDisconnectCallback;
 
         NetworkManager.Singleton.StartHost();
 
+    }
+
+    private void NetworkManager_Host_OnClientDisconnectCallback(ulong clientId)
+    {
+        for (int i = 0; i < playerDataNetworkList.Count; i++)
+        {
+            if (playerDataNetworkList[i].clientId == clientId)
+            {
+                playerDataNetworkList.RemoveAt(i);
+                break;
+            }
+        }
     }
 
     private void NetworkManager_OnClientConnectedCallback(ulong obj)
@@ -55,7 +68,7 @@ public class KitchenMultiplayerGame : NetworkBehaviour
 
     private int GetFirstAvailableColorId()
     {
-        for(int i = 0; i < playerColorList.Count; i++)
+        for (int i = 0; i < playerColorList.Count; i++)
         {
             if (IsColorAvaiable(i))
             {
@@ -225,5 +238,11 @@ public class KitchenMultiplayerGame : NetworkBehaviour
             }
         }
         return true;
+    }
+
+    public void KickPlayer(ulong clientId)
+    {
+        NetworkManager.Singleton.DisconnectClient(clientId);
+        //NetworkManager_Host_OnClientDisconnectCallback(clientId);
     }
 }

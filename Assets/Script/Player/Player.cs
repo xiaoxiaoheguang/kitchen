@@ -43,6 +43,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     [SerializeField] private KitchenObject KitchenObject;
 
     [SerializeField] private List<Vector3> spawnPositionList;
+    [SerializeField] private PlayerVisual playerVisual;
 
     /// <summary>
     /// 当前玩家选中的柜台对象
@@ -105,7 +106,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
             LocalInstance = this;
         }
 
-        transform.position = spawnPositionList[(int)OwnerClientId];
+        transform.position = spawnPositionList[KitchenMultiplayerGame.Instance.GetPlayerDataIndexFromClientId(OwnerClientId)];
 
         OnAnyPlayerSpawned?.Invoke(this, EventArgs.Empty);
 
@@ -133,6 +134,9 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     {
         GameInput.Instance.OnInteraction += GameInput_OnInteraction;
         GameInput.Instance.OnInteractionAlternate += GameInput_OnInteractionAlternate;
+
+        PlayerData playerData = KitchenMultiplayerGame.Instance.GetPlayerDataFromClientId(OwnerClientId);
+        playerVisual.SetPlayerColor(KitchenMultiplayerGame.Instance.GetPlayerColor(playerData.colorId));
     }
 
     /// <summary>

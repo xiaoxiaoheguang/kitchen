@@ -1,6 +1,8 @@
 using System;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CharacterSelectPlayer : MonoBehaviour
 {
@@ -8,12 +10,25 @@ public class CharacterSelectPlayer : MonoBehaviour
     [SerializeField] private int playerIndex;
     [SerializeField] private GameObject readyText;
     [SerializeField] private PlayerVisual playerVisual;
+    [SerializeField] private Button kickButton;
+
+
+    private void Awake()
+    {
+        kickButton.onClick.AddListener(() =>
+        {
+            PlayerData playerData = KitchenMultiplayerGame.Instance.GetPlayerDataFromPlayIndex(playerIndex);
+            
+            KitchenMultiplayerGame.Instance.KickPlayer(playerData.clientId);
+        });
+    }
 
 
     private void Start()
     {
         KitchenMultiplayerGame.Instance.OnPlayerDataNetworkListChanged += KitchenMultiplayerGame_OnPlayerDataNetworkListChanged;
         CharacterSelectReady.Instance.OnReadyChanged += CharacterSelectReady_OnReadyChanged;
+
         UpdatePlayer();
     }
 
@@ -37,7 +52,12 @@ public class CharacterSelectPlayer : MonoBehaviour
            
             readyText.SetActive(CharacterSelectReady.Instance.IsPlayerReady(playerData.clientId));
 
-            playerVisual.SetPlayerColor(KitchenMultiplayerGame.Instance.GetPlayerColor(playerIndex));
+            playerVisual.SetPlayerColor(KitchenMultiplayerGame.Instance.GetPlayerColor(playerData.colorId));
+
+            // 只有服务器，并且不是主机自己的玩家时，才显示 kickButton
+            bool isHost = NetworkManager.Singleton.IsServer;
+            bool isLocalPlayer = playerData.clientId == NetworkManager.Singleton.LocalClientId;
+            kickButton.gameObject.SetActive(isHost && !isLocalPlayer);
         }
         else
         {
@@ -53,5 +73,17 @@ public class CharacterSelectPlayer : MonoBehaviour
     private void Hide()
     {
         gameObject.SetActive(false);
+    }
+
+    private void OnDestroy()
+    {
+        if (KitchenMultiplayerGame.Instance != null)
+        {
+            KitchenMultiplayerGame.Instance.OnPlayerDataNetworkListChanged -= KitchenMultiplayerGame_OnPlayerDataNetworkListChanged;
+        }
+        if (CharacterSelectReady.Instance != null)
+        {
+            CharacterSelectReady.Instance.OnReadyChanged -= CharacterSelectReady_OnReadyChanged;
+        }
     }
 }
