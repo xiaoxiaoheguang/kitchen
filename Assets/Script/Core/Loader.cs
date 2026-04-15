@@ -12,7 +12,16 @@ public static class Loader {
         LoadingScene,
         CharacterSelectScene,
         LobbyScene,
+        LevelSelectScene,
     }
+
+    public enum LevelScene
+    {
+        Level_1_Scene,
+        Level_2_Scene,
+        Level_3_Scene,
+    }
+
     private static Scene targetScene;
 
     public static void Load(Scene targetScene)
@@ -24,6 +33,16 @@ public static class Loader {
     public static void LoadNetwork(Scene targetScene)
     {
         NetworkManager.Singleton.SceneManager.LoadScene(targetScene.ToString(), LoadSceneMode.Single);
+    }
+    public static void LoadLevelNetwork(string sceneName)
+    {
+        NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+    }
+
+    public static void LoadLevelNetwork(int levelIndex)
+    {
+        string sceneName = ((LevelScene)levelIndex).ToString();
+        NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
     }
     public static void LoadCallback()
     {

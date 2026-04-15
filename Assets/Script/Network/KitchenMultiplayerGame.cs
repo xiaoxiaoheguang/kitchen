@@ -21,6 +21,8 @@ public class KitchenMultiplayerGame : NetworkBehaviour
 
     private NetworkList<PlayerData> playerDataNetworkList;
 
+    public NetworkVariable<int> currentLevelIndex = new NetworkVariable<int>(0);
+
     void Awake()
     {
         Instance = this;
