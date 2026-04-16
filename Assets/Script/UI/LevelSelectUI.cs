@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
+using TMPro;
 
 public class LevelSelectUI : NetworkBehaviour
 {
@@ -11,6 +12,7 @@ public class LevelSelectUI : NetworkBehaviour
 
     [SerializeField] private Button levelButton;
     [SerializeField] private Image levelImage;
+    [SerializeField] private TextMeshProUGUI levelText;
 
     [SerializeField] private List<LevelSO> levelSoList;
 
@@ -49,6 +51,10 @@ public class LevelSelectUI : NetworkBehaviour
         {
             LevelSO levelSO = levelSoList[currentIndex];
             levelImage.sprite = levelSO.levelImage;
+            if (levelText != null)
+            {
+                levelText.text = levelSO.levelName;
+            }
         }
     }
 
