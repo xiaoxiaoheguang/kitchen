@@ -151,7 +151,7 @@ public class LevelSelectUI : NetworkBehaviour
             LevelSO levelSO = levelSoList[currentIndex];
             if (isSinglePlayer)
             {
-                Loader.LoadLevelNetwork(levelSO.levelSceneName);
+                Loader.LoadLevel(levelSO.levelSceneName);
             }
             else
             {

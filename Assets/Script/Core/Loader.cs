@@ -44,6 +44,11 @@ public static class Loader {
         string sceneName = ((LevelScene)levelIndex).ToString();
         NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
     }
+
+    public static void LoadLevel(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+    }
     public static void LoadCallback()
     {
         SceneManager.LoadScene(targetScene.ToString());
