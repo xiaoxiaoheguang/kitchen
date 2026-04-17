@@ -20,7 +20,8 @@ public class TestingLobbyUI : MonoBehaviour
             }
             
             GameModeManager.Instance.SetSinglePlayerMode(true);
-            Loader.Load(Loader.Scene.CharacterSelectScene);
+            KitchenMultiplayerGame.Instance.StartHost();
+            Loader.LoadNetwork(Loader.Scene.CharacterSelectScene);
         });
 
         createGameButton.onClick.AddListener(() =>

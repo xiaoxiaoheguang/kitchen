@@ -89,6 +89,13 @@ public class KitchenMultiplayerGame : NetworkBehaviour
             return;
         }
 
+        if (GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode)
+        {
+            response.Approved = false;
+            response.Reason = "Single player mode - no other clients allowed!";
+            return;
+        }
+
         if (NetworkManager.Singleton.ConnectedClientsIds.Count >= MAX_PLAYERCOUNT)
         {
             response.Approved = false;

@@ -26,12 +26,7 @@ public class CharacterSelectPlayer : MonoBehaviour
 
     private void Start()
     {
-        bool isSinglePlayer = GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode;
-        
-        if (!isSinglePlayer)
-        {
-            KitchenMultiplayerGame.Instance.OnPlayerDataNetworkListChanged += KitchenMultiplayerGame_OnPlayerDataNetworkListChanged;
-        }
+        KitchenMultiplayerGame.Instance.OnPlayerDataNetworkListChanged += KitchenMultiplayerGame_OnPlayerDataNetworkListChanged;
         CharacterSelectReady.Instance.OnReadyChanged += CharacterSelectReady_OnReadyChanged;
 
         UpdatePlayer();
@@ -49,42 +44,23 @@ public class CharacterSelectPlayer : MonoBehaviour
 
     private void UpdatePlayer()
     {
-        bool isSinglePlayer = GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode;
-        
-        if (isSinglePlayer)
+        if (KitchenMultiplayerGame.Instance.IsPlayerIndexConnected(playerIndex))
         {
-            if (playerIndex == 0)
-            {
-                Show();
-                readyText.SetActive(CharacterSelectReady.Instance.IsPlayerReady(0));
-                playerVisual.SetPlayerColor(KitchenMultiplayerGame.Instance.GetPlayerColor(0));
-                kickButton.gameObject.SetActive(false);
-            }
-            else
-            {
-                Hide();
-            }
+            Show();
+
+            PlayerData playerData = KitchenMultiplayerGame.Instance.GetPlayerDataFromPlayIndex(playerIndex);
+               
+            readyText.SetActive(CharacterSelectReady.Instance.IsPlayerReady(playerData.clientId));
+
+            playerVisual.SetPlayerColor(KitchenMultiplayerGame.Instance.GetPlayerColor(playerData.colorId));
+
+            bool isHost = NetworkManager.Singleton.IsServer;
+            bool isLocalPlayer = playerData.clientId == NetworkManager.Singleton.LocalClientId;
+            kickButton.gameObject.SetActive(isHost && !isLocalPlayer);
         }
         else
         {
-            if (KitchenMultiplayerGame.Instance.IsPlayerIndexConnected(playerIndex))
-            {
-                Show();
-
-                PlayerData playerData = KitchenMultiplayerGame.Instance.GetPlayerDataFromPlayIndex(playerIndex);
-               
-                readyText.SetActive(CharacterSelectReady.Instance.IsPlayerReady(playerData.clientId));
-
-                playerVisual.SetPlayerColor(KitchenMultiplayerGame.Instance.GetPlayerColor(playerData.colorId));
-
-                bool isHost = NetworkManager.Singleton.IsServer;
-                bool isLocalPlayer = playerData.clientId == NetworkManager.Singleton.LocalClientId;
-                kickButton.gameObject.SetActive(isHost && !isLocalPlayer);
-            }
-            else
-            {
-                Hide();
-            }
+            Hide();
         }
     }
 
@@ -100,9 +76,7 @@ public class CharacterSelectPlayer : MonoBehaviour
 
     private void OnDestroy()
     {
-        bool isSinglePlayer = GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode;
-        
-        if (!isSinglePlayer && KitchenMultiplayerGame.Instance != null)
+        if (KitchenMultiplayerGame.Instance != null)
         {
             KitchenMultiplayerGame.Instance.OnPlayerDataNetworkListChanged -= KitchenMultiplayerGame_OnPlayerDataNetworkListChanged;
         }

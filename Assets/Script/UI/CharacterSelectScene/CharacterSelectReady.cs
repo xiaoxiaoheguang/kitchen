@@ -11,7 +11,6 @@ public class CharacterSelectReady : NetworkBehaviour
     public event EventHandler OnReadyChanged;
 
     private Dictionary<ulong, bool> playerReadyMap;
-    private bool isSinglePlayerReady = false;
 
     private void Awake()
     {
@@ -21,16 +20,7 @@ public class CharacterSelectReady : NetworkBehaviour
 
     public void SetPlayerReady()
     {
-        if (GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode)
-        {
-            isSinglePlayerReady = true;
-            OnReadyChanged?.Invoke(this, EventArgs.Empty);
-            Loader.Load(Loader.Scene.LevelSelectScene);
-        }
-        else
-        {
-            SetPlayerReadyServerRpc();
-        }
+        SetPlayerReadyServerRpc();
     }
 
 
@@ -68,10 +58,6 @@ public class CharacterSelectReady : NetworkBehaviour
 
     public bool IsPlayerReady(ulong clientId)
     {
-        if (GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode)
-        {
-            return isSinglePlayerReady;
-        }
         return playerReadyMap.ContainsKey(clientId) && playerReadyMap[clientId];
     }
 }
