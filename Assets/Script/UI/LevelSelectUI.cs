@@ -9,6 +9,7 @@ public class LevelSelectUI : NetworkBehaviour
 {
     [SerializeField] private Button leftButtons;
     [SerializeField] private Button rightButtons;
+    [SerializeField] private Button returnButton;
 
     [SerializeField] private Button levelButton;
     [SerializeField] private Image levelImage;
@@ -16,17 +17,36 @@ public class LevelSelectUI : NetworkBehaviour
 
     [SerializeField] private List<LevelSO> levelSoList;
 
+    private int currentLevelIndex = 0;
+
     private void Awake()
     {
         levelButton.onClick.AddListener(OnLevelButtonClick);
         leftButtons.onClick.AddListener(OnLeftButtonClick);
         rightButtons.onClick.AddListener(OnRightButtonClick);
+        returnButton.onClick.AddListener(OnReturnButtonClick);
+    }
+
+    private void Start()
+    {
+        bool isSinglePlayer = GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode;
+        
+        if (isSinglePlayer)
+        {
+            UpdateButtonVisibility();
+            UpdateLevelVisual();
+        }
     }
 
     public override void OnNetworkSpawn()
     {
-        KitchenMultiplayerGame.Instance.currentLevelIndex.OnValueChanged += OnCurrentLevelIndexChanged;
-
+        bool isSinglePlayer = GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode;
+        
+        if (!isSinglePlayer)
+        {
+            KitchenMultiplayerGame.Instance.currentLevelIndex.OnValueChanged += OnCurrentLevelIndexChanged;
+        }
+        
         UpdateButtonVisibility();
         UpdateLevelVisual();
     }
@@ -38,15 +58,20 @@ public class LevelSelectUI : NetworkBehaviour
 
     private void UpdateButtonVisibility()
     {
-        bool isHost = IsServer;
-        leftButtons.gameObject.SetActive(isHost);
-        rightButtons.gameObject.SetActive(isHost);
-        levelButton.gameObject.SetActive(isHost);
+        bool isSinglePlayer = GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode;
+        bool shouldShowButtons = isSinglePlayer || IsServer;
+        
+        leftButtons.gameObject.SetActive(shouldShowButtons);
+        rightButtons.gameObject.SetActive(shouldShowButtons);
+        levelButton.gameObject.SetActive(shouldShowButtons);
+        returnButton.gameObject.SetActive(shouldShowButtons);
     }
 
     private void UpdateLevelVisual()
     {
-        int currentIndex = KitchenMultiplayerGame.Instance.currentLevelIndex.Value;
+        bool isSinglePlayer = GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode;
+        int currentIndex = isSinglePlayer ? currentLevelIndex : KitchenMultiplayerGame.Instance.currentLevelIndex.Value;
+        
         if (levelSoList != null && levelSoList.Count > currentIndex)
         {
             LevelSO levelSO = levelSoList[currentIndex];
@@ -60,43 +85,100 @@ public class LevelSelectUI : NetworkBehaviour
 
     private void OnRightButtonClick()
     {
-        if (!IsServer) return;
+        bool isSinglePlayer = GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode;
+        
+        if (!isSinglePlayer && !IsServer) return;
 
-        int newIndex = KitchenMultiplayerGame.Instance.currentLevelIndex.Value + 1;
-        if (newIndex >= levelSoList.Count)
+        if (isSinglePlayer)
         {
-            newIndex = 0;
+            int newIndex = currentLevelIndex + 1;
+            if (newIndex >= levelSoList.Count)
+            {
+                newIndex = 0;
+            }
+            currentLevelIndex = newIndex;
         }
-        KitchenMultiplayerGame.Instance.currentLevelIndex.Value = newIndex;
+        else
+        {
+            int newIndex = KitchenMultiplayerGame.Instance.currentLevelIndex.Value + 1;
+            if (newIndex >= levelSoList.Count)
+            {
+                newIndex = 0;
+            }
+            KitchenMultiplayerGame.Instance.currentLevelIndex.Value = newIndex;
+        }
+        
+        UpdateLevelVisual();
     }
 
     private void OnLeftButtonClick()
     {
-        if (!IsServer) return;
+        bool isSinglePlayer = GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode;
+        
+        if (!isSinglePlayer && !IsServer) return;
 
-        int newIndex = KitchenMultiplayerGame.Instance.currentLevelIndex.Value - 1;
-        if (newIndex < 0)
+        if (isSinglePlayer)
         {
-            newIndex = levelSoList.Count - 1;
+            int newIndex = currentLevelIndex - 1;
+            if (newIndex < 0)
+            {
+                newIndex = levelSoList.Count - 1;
+            }
+            currentLevelIndex = newIndex;
         }
-        KitchenMultiplayerGame.Instance.currentLevelIndex.Value = newIndex;
+        else
+        {
+            int newIndex = KitchenMultiplayerGame.Instance.currentLevelIndex.Value - 1;
+            if (newIndex < 0)
+            {
+                newIndex = levelSoList.Count - 1;
+            }
+            KitchenMultiplayerGame.Instance.currentLevelIndex.Value = newIndex;
+        }
+        
+        UpdateLevelVisual();
     }
 
     private void OnLevelButtonClick()
     {
-        if (!IsServer) return;
+        bool isSinglePlayer = GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode;
+        
+        if (!isSinglePlayer && !IsServer) return;
 
-        int currentIndex = KitchenMultiplayerGame.Instance.currentLevelIndex.Value;
+        int currentIndex = isSinglePlayer ? currentLevelIndex : KitchenMultiplayerGame.Instance.currentLevelIndex.Value;
         if (levelSoList != null && levelSoList.Count > currentIndex)
         {
             LevelSO levelSO = levelSoList[currentIndex];
-            Loader.LoadNetwork(Loader.Scene.CharacterSelectScene);
+            if (isSinglePlayer)
+            {
+                Loader.LoadLevelNetwork(levelSO.levelSceneName);
+            }
+            else
+            {
+                Loader.LoadLevelNetwork(KitchenMultiplayerGame.Instance.currentLevelIndex.Value);
+            }
         }
+    }
+
+    private void OnReturnButtonClick()
+    {
+        bool isSinglePlayer = GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode;
+        
+        if (!isSinglePlayer && !IsServer) return;
+
+        if (!isSinglePlayer && NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
+        
+        Loader.Load(Loader.Scene.MainMenuScene);
     }
 
     public override void OnNetworkDespawn()
     {
-        if (KitchenMultiplayerGame.Instance != null && KitchenMultiplayerGame.Instance.currentLevelIndex != null)
+        bool isSinglePlayer = GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode;
+        
+        if (!isSinglePlayer && KitchenMultiplayerGame.Instance != null && KitchenMultiplayerGame.Instance.currentLevelIndex != null)
         {
             KitchenMultiplayerGame.Instance.currentLevelIndex.OnValueChanged -= OnCurrentLevelIndexChanged;
         }

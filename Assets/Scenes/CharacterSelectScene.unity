@@ -415,7 +415,7 @@ GameObject:
   - component: {fileID: 190673114}
   - component: {fileID: 190673113}
   m_Layer: 5
-  m_Name: MainMenuButton
+  m_Name: ReturnButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1915,7 +1915,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u8FD4\u56DE\u4E3B\u9875"
+  m_text: "\u8FD4\u56DE"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b559bc323cf119b4db4d1f9e3606751e, type: 2}
   m_sharedMaterial: {fileID: -253231245920787750, guid: b559bc323cf119b4db4d1f9e3606751e,
@@ -3120,7 +3120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00fad00143b64524b9064ac4ec6efeb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainMenuButton: {fileID: 190673113}
+  returnButton: {fileID: 190673113}
   readyButton: {fileID: 484511195}
 --- !u!1001 &1916817404
 PrefabInstance:

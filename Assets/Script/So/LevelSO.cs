@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using System;
-using UnityEditor.SearchService;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "LevelSO", menuName = "Scriptable Objects/LevelSO")]
