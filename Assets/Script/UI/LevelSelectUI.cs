@@ -14,6 +14,7 @@ public class LevelSelectUI : NetworkBehaviour
     [SerializeField] private Button levelButton;
     [SerializeField] private Image levelImage;
     [SerializeField] private TextMeshProUGUI levelText;
+    [SerializeField] private TextMeshProUGUI gameModeText;
 
     [SerializeField] private List<LevelSO> levelSoList;
 
@@ -31,6 +32,7 @@ public class LevelSelectUI : NetworkBehaviour
     {
         UpdateButtonVisibility();
         UpdateLevelVisual();
+        UpdateGameModeText();
     }
 
     public override void OnNetworkSpawn()
@@ -39,6 +41,7 @@ public class LevelSelectUI : NetworkBehaviour
         
         UpdateButtonVisibility();
         UpdateLevelVisual();
+        UpdateGameModeText();
     }
 
     private void OnCurrentLevelIndexChanged(int previousValue, int newValue)
@@ -68,6 +71,15 @@ public class LevelSelectUI : NetworkBehaviour
             {
                 levelText.text = levelSO.levelName;
             }
+        }
+    }
+
+    private void UpdateGameModeText()
+    {
+        if (gameModeText != null)
+        {
+            bool isSinglePlayer = GameModeManager.Instance != null && GameModeManager.Instance.IsSinglePlayerMode;
+            gameModeText.text = isSinglePlayer ? "单人模式" : "多人模式";
         }
     }
 

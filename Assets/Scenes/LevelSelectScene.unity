@@ -303,6 +303,7 @@ MonoBehaviour:
   levelButton: {fileID: 44177149}
   levelImage: {fileID: 901970846}
   levelText: {fileID: 1313858845}
+  gameModeText: {fileID: 1590827736}
   levelSoList:
   - {fileID: 11400000, guid: a36f8617d3319e44ba92e9303ff3913b, type: 2}
   - {fileID: 11400000, guid: 27354b5330173ef4b8ced561c21af95a, type: 2}
