@@ -56,11 +56,12 @@ public class GameManager : NetworkBehaviour
     private NetworkVariable<float> countdownTimer = new NetworkVariable<float>(3f);
     private NetworkVariable<float> gameplayTimer = new NetworkVariable<float>(0f);
 
-    private float gameplayTimerMax = 90f;
+    [SerializeField] private float gameplayTimerMax = 3f;
 
     private bool autoTestGamePauseState;
 
     [SerializeField] private Transform playerPrefab;
+    [SerializeField] private LevelSO[] levelsSO;
 
     #endregion
 

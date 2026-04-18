@@ -16,10 +16,6 @@ public class LevelSelectUI : NetworkBehaviour
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI gameModeText;
 
-    [SerializeField] private List<LevelSO> levelSoList;
-
-    private int currentLevelIndex = 0;
-
     private void Awake()
     {
         levelButton.onClick.AddListener(OnLevelButtonClick);
@@ -62,6 +58,7 @@ public class LevelSelectUI : NetworkBehaviour
     private void UpdateLevelVisual()
     {
         int currentIndex = KitchenMultiplayerGame.Instance.currentLevelIndex.Value;
+        List<LevelSO> levelSoList = GameModeManager.Instance?.LevelSoList;
         
         if (levelSoList != null && levelSoList.Count > currentIndex)
         {
@@ -87,13 +84,7 @@ public class LevelSelectUI : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        int newIndex = KitchenMultiplayerGame.Instance.currentLevelIndex.Value + 1;
-        if (newIndex >= levelSoList.Count)
-        {
-            newIndex = 0;
-        }
-        KitchenMultiplayerGame.Instance.currentLevelIndex.Value = newIndex;
-        
+        GameModeManager.Instance?.NextLevel();
         UpdateLevelVisual();
     }
 
@@ -101,13 +92,7 @@ public class LevelSelectUI : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        int newIndex = KitchenMultiplayerGame.Instance.currentLevelIndex.Value - 1;
-        if (newIndex < 0)
-        {
-            newIndex = levelSoList.Count - 1;
-        }
-        KitchenMultiplayerGame.Instance.currentLevelIndex.Value = newIndex;
-        
+        GameModeManager.Instance?.PreviousLevel();
         UpdateLevelVisual();
     }
 
@@ -115,11 +100,7 @@ public class LevelSelectUI : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        int currentIndex = KitchenMultiplayerGame.Instance.currentLevelIndex.Value;
-        if (levelSoList != null && levelSoList.Count > currentIndex)
-        {
-            Loader.LoadLevelNetwork(KitchenMultiplayerGame.Instance.currentLevelIndex.Value);
-        }
+        GameModeManager.Instance?.LoadSelectedLevel();
     }
 
     private void OnReturnButtonClick()

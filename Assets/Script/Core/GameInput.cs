@@ -102,6 +102,7 @@ public class GameInput : MonoBehaviour
         playerInput.player.InteractAlternate.performed -= InteractAlternate_performed;
         playerInput.player.Pause.performed -= Pause_performed;
 
+        playerInput.player.Disable();
         playerInput.Dispose();
     }
     #endregion
