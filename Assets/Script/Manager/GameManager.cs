@@ -98,6 +98,14 @@ public class GameManager : NetworkBehaviour
                 countdownTimer.Value -= Time.deltaTime;
                 if (countdownTimer.Value < 0f)
                 {
+                    // 根据当前关卡设置游戏时间
+                    List<LevelSO> levelSoList = GameModeManager.Instance?.LevelSoList;
+                    int currentLevelIndex = KitchenMultiplayerGame.Instance?.currentLevelIndex.Value ?? 0;
+                    if (levelSoList != null && levelSoList.Count > currentLevelIndex)
+                    {
+                        gameplayTimerMax = levelSoList[currentLevelIndex].levelTime;
+                    }
+
                     state.Value = State.GamePlaying;
                     gameplayTimer.Value = gameplayTimerMax;
                 }

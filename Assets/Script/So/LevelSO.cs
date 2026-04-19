@@ -9,6 +9,7 @@ public class LevelSO : ScriptableObject
     public int levelIndex;
     public string levelName;
     public Sprite levelImage;
+    public int levelTime;
 
     public int requiredScore;
 
