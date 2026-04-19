@@ -124,6 +124,16 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         }
     }
 
+    public override void OnNetworkDespawn()
+    {
+        if (IsServer && NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientDisconnectCallback -= NetworkManager_OnClientDisconnectCallback;
+        }
+
+        base.OnNetworkDespawn();
+    }
+
     /// <summary>
     /// 游戏开始时注册输入事件监听
     /// 功能：订阅游戏输入系统的交互和备用交互事件
@@ -137,6 +147,15 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
 
         PlayerData playerData = KitchenMultiplayerGame.Instance.GetPlayerDataFromClientId(OwnerClientId);
         playerVisual.SetPlayerColor(KitchenMultiplayerGame.Instance.GetPlayerColor(playerData.colorId));
+    }
+
+    private void OnDestroy()
+    {
+        if (GameInput.Instance != null)
+        {
+            GameInput.Instance.OnInteraction -= GameInput_OnInteraction;
+            GameInput.Instance.OnInteractionAlternate -= GameInput_OnInteractionAlternate;
+        }
     }
 
     /// <summary>

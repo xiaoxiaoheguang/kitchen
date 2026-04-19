@@ -5071,6 +5071,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 830517924145544097, guid: 4ed2acf1c3640c24ea86bd32f6b0a5b0,
+        type: 3}
+      propertyPath: m_Name
+      value: target
+      objectReference: {fileID: 0}
     - target: {fileID: 1257596875994139807, guid: 4ed2acf1c3640c24ea86bd32f6b0a5b0,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -5155,6 +5160,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2970654559320629124, guid: 4ed2acf1c3640c24ea86bd32f6b0a5b0,
+        type: 3}
+      propertyPath: m_Name
+      value: DeliveryRecipe
       objectReference: {fileID: 0}
     - target: {fileID: 3155399360857559548, guid: 4ed2acf1c3640c24ea86bd32f6b0a5b0,
         type: 3}

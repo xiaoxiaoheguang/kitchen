@@ -18,14 +18,22 @@ public class CounterSelectVisual : MonoBehaviour
         {
             Player.OnAnyPlayerSpawned += Player_OnAnyPlayerSpawned;
         }
+    }
 
+    private void OnDestroy()
+    {
+        if (Player.LocalInstance != null)
+        {
+            Player.LocalInstance.OnSelectedCounterChanged -= Play_OnSelectedCounterChanged;
+        }
+        Player.OnAnyPlayerSpawned -= Player_OnAnyPlayerSpawned;
     }
 
     private void Player_OnAnyPlayerSpawned(object sender, EventArgs e)
     {
         if (Player.LocalInstance != null)
         {
-            Player.LocalInstance.OnSelectedCounterChanged -= Player_OnAnyPlayerSpawned;
+            Player.OnAnyPlayerSpawned -= Player_OnAnyPlayerSpawned;
             Player.LocalInstance.OnSelectedCounterChanged += Play_OnSelectedCounterChanged;
         }
     }
@@ -35,25 +43,32 @@ public class CounterSelectVisual : MonoBehaviour
         if (e.selectedCounter != basecounter)
         {
             Hide();
-
         }
         else
         {
             Show();
         }
     }
+
     private void Show()
     {
         foreach (GameObject go in visualGameObjectArray)
         {
-            go.SetActive(true);
+            if (go != null)
+            {
+                go.SetActive(true);
+            }
         }
     }
+
     private void Hide()
     {
         foreach (GameObject go in visualGameObjectArray)
         {
-            go.SetActive(false);
+            if (go != null)
+            {
+                go.SetActive(false);
+            }
         }
     }
 }

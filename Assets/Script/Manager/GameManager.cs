@@ -137,6 +137,29 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    public override void OnNetworkDespawn()
+    {
+        state.OnValueChanged -= State_OnValueChanged;
+        isPause.OnValueChanged -= IsPause_OnValueChanged;
+
+        if (IsServer && NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= NetworkManger_ClientConnectedCallback;
+            NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= SceneManager_OnLoadEventCompleted;
+        }
+
+        base.OnNetworkDespawn();
+    }
+
+    private void OnDestroy()
+    {
+        if (GameInput.Instance != null)
+        {
+            GameInput.Instance.OnPauseAction -= GameInput_OnPauseAction;
+            GameInput.Instance.OnInteraction -= GameInput_OnInteraction;
+        }
+    }
+
     private void SceneManager_OnLoadEventCompleted(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
