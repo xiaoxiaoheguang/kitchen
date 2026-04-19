@@ -16,3 +16,6 @@ MonoBehaviour:
   levelIndex: 1
   levelName: 1
   levelImage: {fileID: 21300000, guid: 77b28124b8bda494381c80bd5aa42c22, type: 3}
+  levelTime: 20
+  levelRecipeListSO: {fileID: 0}
+  requiredScore: 0

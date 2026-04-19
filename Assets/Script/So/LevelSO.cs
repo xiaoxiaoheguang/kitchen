@@ -10,6 +10,8 @@ public class LevelSO : ScriptableObject
     public string levelName;
     public Sprite levelImage;
     public int levelTime;
+public RecipeListSO levelRecipeListSO;
+
 
     public int requiredScore;
 

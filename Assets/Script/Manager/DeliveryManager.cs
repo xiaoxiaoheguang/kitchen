@@ -15,8 +15,8 @@ public class DeliveryManager : NetworkBehaviour
     public event EventHandler OnRecipeFailed;
     public event EventHandler OnScoreChanged;
 
-    [SerializeField] private RecipeListSO recipeListSO;
     private List<RecipeSO> waitingRecipeSOList;
+    private RecipeListSO currentLevelRecipeListSO;
 
     private float spawnRecipeTimer = 4f;
     private float spawnRecipeTimerMax = 4f;
@@ -40,6 +40,14 @@ public class DeliveryManager : NetworkBehaviour
             successAmount = 0;
             waitingRecipeSOList.Clear();
         }
+
+        // 从当前关卡获取食谱列表
+        List<LevelSO> levelSoList = GameModeManager.Instance?.LevelSoList;
+        int currentLevelIndex = KitchenMultiplayerGame.Instance?.currentLevelIndex.Value ?? 0;
+        if (levelSoList != null && levelSoList.Count > currentLevelIndex)
+        {
+            currentLevelRecipeListSO = levelSoList[currentLevelIndex].levelRecipeListSO;
+        }
     }
 
     private void Update()
@@ -52,9 +60,9 @@ public class DeliveryManager : NetworkBehaviour
         {
             spawnRecipeTimer = spawnRecipeTimerMax;
 
-            if (GameManager.Instance.IsGamePlaying() && waitingRecipeSOList.Count < waitRecipeAmountMax)
+            if (GameManager.Instance.IsGamePlaying() && waitingRecipeSOList.Count < waitRecipeAmountMax && currentLevelRecipeListSO != null)
             {
-                int waittingRecipeSOIndex = UnityEngine.Random.Range(0, recipeListSO.recipeSOList.Count);
+                int waittingRecipeSOIndex = UnityEngine.Random.Range(0, currentLevelRecipeListSO.recipeSOList.Count);
 
                 SpawnNewWaittingRecipeClientRpc(waittingRecipeSOIndex);
                 //Debug.Log(waitRecipeSO);
@@ -65,10 +73,13 @@ public class DeliveryManager : NetworkBehaviour
     [ClientRpc]
     private void SpawnNewWaittingRecipeClientRpc(int waittingRecipeSOIndex)
     {
-        RecipeSO waitRecipeSO = recipeListSO.recipeSOList[waittingRecipeSOIndex];
-        waitingRecipeSOList.Add(waitRecipeSO);
+        if (currentLevelRecipeListSO != null)
+        {
+            RecipeSO waitRecipeSO = currentLevelRecipeListSO.recipeSOList[waittingRecipeSOIndex];
+            waitingRecipeSOList.Add(waitRecipeSO);
 
-        OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
+            OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     public void DeliverRecipe(PlateKitchenObject plateKitchenObject)
