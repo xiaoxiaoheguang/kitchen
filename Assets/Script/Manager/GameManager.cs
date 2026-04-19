@@ -55,8 +55,7 @@ public class GameManager : NetworkBehaviour
 
     private NetworkVariable<float> countdownTimer = new NetworkVariable<float>(3f);
     private NetworkVariable<float> gameplayTimer = new NetworkVariable<float>(0f);
-
-    [SerializeField] private float gameplayTimerMax = 3f;
+    private NetworkVariable<float> gameplayTimerMax = new NetworkVariable<float>(3f);
 
     private bool autoTestGamePauseState;
 
@@ -103,11 +102,11 @@ public class GameManager : NetworkBehaviour
                     int currentLevelIndex = KitchenMultiplayerGame.Instance?.currentLevelIndex.Value ?? 0;
                     if (levelSoList != null && levelSoList.Count > currentLevelIndex)
                     {
-                        gameplayTimerMax = levelSoList[currentLevelIndex].levelTime;
+                        gameplayTimerMax.Value = levelSoList[currentLevelIndex].levelTime;
                     }
 
                     state.Value = State.GamePlaying;
-                    gameplayTimer.Value = gameplayTimerMax;
+                    gameplayTimer.Value = gameplayTimerMax.Value;
                 }
                 break;
 
@@ -140,6 +139,14 @@ public class GameManager : NetworkBehaviour
 
         if (IsServer)
         {
+            // 服务器端初始化游戏时间
+            List<LevelSO> levelSoList = GameModeManager.Instance?.LevelSoList;
+            int currentLevelIndex = KitchenMultiplayerGame.Instance?.currentLevelIndex.Value ?? 0;
+            if (levelSoList != null && levelSoList.Count > currentLevelIndex)
+            {
+                gameplayTimerMax.Value = levelSoList[currentLevelIndex].levelTime;
+            }
+
             NetworkManager.Singleton.OnClientConnectedCallback += NetworkManger_ClientConnectedCallback;
             NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SceneManager_OnLoadEventCompleted;
         }
@@ -324,7 +331,7 @@ public class GameManager : NetworkBehaviour
 
     public float GetGameplayTimerNormalized()
     {
-        return 1 - (gameplayTimer.Value / gameplayTimerMax);
+        return 1 - (gameplayTimer.Value / gameplayTimerMax.Value);
     }
 
     #endregion
