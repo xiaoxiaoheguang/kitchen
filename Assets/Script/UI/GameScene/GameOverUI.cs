@@ -7,8 +7,8 @@ using UnityEngine.UI;
 
 public class GameOverUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI deliveryAmount;
-    [SerializeField] private TextMeshProUGUI targetAmount;
+    [SerializeField] private TextMeshProUGUI totalScoreText;
+    [SerializeField] private TextMeshProUGUI targetScoreText;
 
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private Button nextLevelButton;
@@ -46,41 +46,41 @@ public class GameOverUI : MonoBehaviour
         {
             Show();
             
-            int deliveryCount = DeliveryManager.Instance.GetSuccessRecipeSOCount();
+            int totalScore = DeliveryManager.Instance.GetTotalScore();
+            Debug.Log($"Total Score: {totalScore}");
             
             // 获取当前关卡的目标分数
-            int targetCount = 0;
+            int targetScore = 0;
             List<LevelSO> levelSoList = GameModeManager.Instance?.LevelSoList;
             int currentLevelIndex = KitchenMultiplayerGame.Instance?.currentLevelIndex.Value ?? 0;
             if (levelSoList != null && levelSoList.Count > currentLevelIndex)
             {
-                targetCount = levelSoList[currentLevelIndex].requiredScore;
+                targetScore = levelSoList[currentLevelIndex].requiredScore;
             }
             
             // 设置文本
-            deliveryAmount.text = deliveryCount.ToString();
-            targetAmount.text = targetCount.ToString();
+            totalScoreText.text = totalScore.ToString();
+            targetScoreText.text = targetScore.ToString();
             
             // 判断胜利或失败
-            bool isWin = deliveryCount >= targetCount;
+            bool isWin = totalScore >= targetScore;
             
             // 设置颜色
             Color textColor = isWin ? winColor : loseColor;
-            deliveryAmount.color = textColor;
-            targetAmount.color = textColor;
+            totalScoreText.color = textColor;
+            targetScoreText.color = textColor;
             
             // 根据胜利/失败状态控制下一关按钮的显示
             nextLevelButton.gameObject.SetActive(isWin);
 
             // 高级骚操作：在 Console 里直接显示颜色
             string hex = ColorUtility.ToHtmlStringRGBA(textColor);
-            string deliveryHex = ColorUtility.ToHtmlStringRGBA(deliveryAmount.color);
-            string targetHex = ColorUtility.ToHtmlStringRGBA(targetAmount.color);
+            string totalHex = ColorUtility.ToHtmlStringRGBA(totalScoreText.color);
+            string targetHex = ColorUtility.ToHtmlStringRGBA(targetScoreText.color);
             
             Debug.Log($"Is Win: <b>{isWin}</b>\n" +
-                     $"Text Color: <color=#{hex}>■■■■ #{hex}</color>\n" +
-                     $"deliveryAmount.color: <color=#{deliveryHex}>■■■■ #{deliveryHex}</color>\n" +
-                     $"targetAmount.color: <color=#{targetHex}>■■■■ #{targetHex}</color>");
+                     $"Total Score: <color=#{totalHex}>{totalScore}</color>\n" +
+                     $"Target Score: <color=#{targetHex}>{targetScore}</color>");
 
 
         }

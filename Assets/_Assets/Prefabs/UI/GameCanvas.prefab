@@ -8924,8 +8924,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f64028f4c38b4f046bc2b499c88222d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deliveryAmount: {fileID: 5676798617274930614}
-  targetAmount: {fileID: 5676798617274930614}
+  totalScoreText: {fileID: 5502027567596394409}
+  targetScoreText: {fileID: 5676798617274930614}
   mainMenuButton: {fileID: 3115640902591455576}
   nextLevelButton: {fileID: 7238789559737356335}
   winColor: {r: 0, g: 0.7987421, b: 0.090837285, a: 1}

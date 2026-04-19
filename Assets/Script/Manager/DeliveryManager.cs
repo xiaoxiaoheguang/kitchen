@@ -13,6 +13,7 @@ public class DeliveryManager : NetworkBehaviour
     public event EventHandler OnRecipeCompleted;
     public event EventHandler OnRecipeSuccess;
     public event EventHandler OnRecipeFailed;
+    public event EventHandler OnScoreChanged;
 
     [SerializeField] private RecipeListSO recipeListSO;
     private List<RecipeSO> waitingRecipeSOList;
@@ -22,11 +23,23 @@ public class DeliveryManager : NetworkBehaviour
 
     private int waitRecipeAmountMax = 4;
     private int successAmount = 0;
+    private NetworkVariable<int> totalScore = new NetworkVariable<int>(0);
 
     private void Awake()
     {
         Instance = this;
         waitingRecipeSOList = new List<RecipeSO>();
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        // é‡ç½®å¾—åˆ†å’Œç­‰å¾…é£Ÿè°±åˆ—è¡¨
+        if (IsServer)
+        {
+            totalScore.Value = 0;
+            successAmount = 0;
+            waitingRecipeSOList.Clear();
+        }
     }
 
     private void Update()
@@ -62,7 +75,7 @@ public class DeliveryManager : NetworkBehaviour
     {
         for (int i = 0; i < waitingRecipeSOList.Count; i++)
         {
-            //±éÀú¶©µ¥£¬²éÕÒµİ½»µÄ²ËÆ×ÊÇ·ñÓë ¶©µ¥ÁĞ±í ÀïÄ³ÏîÏàÍ¬
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òµİ½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ğ±ï¿½ ï¿½ï¿½Ä³ï¿½ï¿½ï¿½ï¿½Í¬
             RecipeSO waitingRecipeSO = waitingRecipeSOList[i];
 
             if (waitingRecipeSO.kitchenObjectSOList.Count == plateKitchenObject.GetKitchenObjectSOList().Count)
@@ -121,6 +134,10 @@ public class DeliveryManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void DeliverCorrectRecipeServerRpc(int waittingRecipeSOIndex)
     {
+        // åœ¨æœåŠ¡å™¨ç«¯å¢åŠ å¾—åˆ†
+        RecipeSO deliveredRecipe = waitingRecipeSOList[waittingRecipeSOIndex];
+        totalScore.Value += deliveredRecipe.score;
+
         DeliverCorrectRecipeClientRpc(waittingRecipeSOIndex);
     }
 
@@ -129,6 +146,7 @@ public class DeliveryManager : NetworkBehaviour
     {
         successAmount++;
 
+        OnScoreChanged?.Invoke(this, EventArgs.Empty);
         waitingRecipeSOList.RemoveAt(waittingRecipeSOIndex);
 
         OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
@@ -143,5 +161,10 @@ public class DeliveryManager : NetworkBehaviour
     public int GetSuccessRecipeSOCount()
     {
         return successAmount;
+    }
+
+    public int GetTotalScore()
+    {
+        return totalScore.Value;
     }
 }
