@@ -42,7 +42,6 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
     /// </summary>
     [SerializeField] private KitchenObject KitchenObject;
 
-    [SerializeField] private List<Vector3> spawnPositionList;
     [SerializeField] private PlayerVisual playerVisual;
 
     /// <summary>
@@ -106,7 +105,8 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
             LocalInstance = this;
         }
 
-        transform.position = spawnPositionList[KitchenMultiplayerGame.Instance.GetPlayerDataIndexFromClientId(OwnerClientId)];
+        // 注意：位置和旋转已经在 GameManager 中 Spawn 之前设置好了
+        // 这样可以确保服务器和客户端位置一致
 
         OnAnyPlayerSpawned?.Invoke(this, EventArgs.Empty);
 

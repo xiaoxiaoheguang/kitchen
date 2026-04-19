@@ -61,6 +61,7 @@ public class GameManager : NetworkBehaviour
 
     [SerializeField] private Transform playerPrefab;
     [SerializeField] private LevelSO[] levelsSO;
+    [SerializeField] private Transform[] playerSpawnPoints;
 
     #endregion
 
@@ -179,7 +180,21 @@ public class GameManager : NetworkBehaviour
     {
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
+            // 获取玩家索引
+            int playerIndex = KitchenMultiplayerGame.Instance.GetPlayerDataIndexFromClientId(clientId);
+            
+            // 实例化玩家预制体
             Transform playerTransform = Instantiate(playerPrefab);
+            
+            // 在 Spawn 之前就设置好位置和旋转
+            Transform spawnPoint = GetPlayerSpawnPoint(playerIndex);
+            if (spawnPoint != null)
+            {
+                playerTransform.position = spawnPoint.position;
+                playerTransform.rotation = spawnPoint.rotation;
+            }
+            
+            // 作为玩家对象 Spawn，位置会自动同步
             playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
         }
     }
@@ -332,6 +347,18 @@ public class GameManager : NetworkBehaviour
     public float GetGameplayTimerNormalized()
     {
         return 1 - (gameplayTimer.Value / gameplayTimerMax.Value);
+    }
+
+    /// <summary>
+    /// 获取指定玩家索引的生成点
+    /// </summary>
+    public Transform GetPlayerSpawnPoint(int playerIndex)
+    {
+        if (playerSpawnPoints != null && playerSpawnPoints.Length > playerIndex)
+        {
+            return playerSpawnPoints[playerIndex];
+        }
+        return null;
     }
 
     #endregion
